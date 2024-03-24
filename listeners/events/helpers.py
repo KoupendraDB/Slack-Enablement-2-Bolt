@@ -129,10 +129,21 @@ def handle_home_view(client, team, user):
         task_blocks = generate_tasks_blocks(tasks_response['tasks'], user)
         blocks = [
             {
-                "type": "header",
+                "type": "section",
                 "text": {
-                    "type": "plain_text",
-                    "text": f"{len(tasks_response['tasks'])} ticket(s) assigned to you",
+                    "type": "mrkdwn",
+                    "text": f"*{len(tasks_response['tasks'])} task(s) assigned to you*"
+                },
+                "accessory": {
+                    "type": "button",
+                    "style": "primary",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Refresh :arrows_clockwise:",
+                        "emoji": True
+                    },
+                    "value": "refresh",
+                    "action_id": "refresh_home"
                 }
             },
             {
