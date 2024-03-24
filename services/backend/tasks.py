@@ -21,3 +21,13 @@ def update_task(task_id, workspace, user, payload):
         data=payload
     )
     return result
+
+def create_task(workspace, user, payload):
+    jwt = fetch_user_jwt(workspace, user)
+    result = make_request(
+        name='POST_TASK',
+        request_type='POST',
+        headers={'bearer-token': jwt},
+        data=payload
+    )
+    return result

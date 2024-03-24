@@ -32,14 +32,12 @@ def create_task_modal(message, user):
                 "type": "input",
                 "block_id": "task_description_block",
                 "element": {
-                    "type": "plain_text_input",
+                    "type": "rich_text_input",
                     "action_id": "task_description_input",
                     "placeholder": {
                         "type": "plain_text",
-                        "text": "Task description"
-                    },
-                    "multiline": True,
-                    "initial_value": message
+                        "text": "Task Description"
+                    }
                 },
                 "label": {
                     "type": "plain_text",

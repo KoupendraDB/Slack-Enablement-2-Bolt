@@ -1,5 +1,6 @@
 from services.backend.tasks import get_tasks
-from datetime import date, datetime
+from datetime import datetime
+from json import loads
 
 def get_task_status_options():
     tasks_statuses = ['Ready', 'In-Progress', 'Code Review', 'Deployed', 'QA', 'Rejected', 'Blocked', 'Accepted', 'Cancelled']
@@ -79,14 +80,6 @@ def generate_tasks_blocks(user_tasks, user):
                 }
             },
             {
-                "type": "section",
-                "text": {
-                    "type": "plain_text",
-                    "text": f"{user_task.get('description', 'null')}",
-                    "emoji": True
-                }
-            },
-            {
                 "type": "actions",
                 "elements": get_action_elements(user, user_task)
             },
@@ -102,7 +95,7 @@ def generate_tasks_blocks(user_tasks, user):
                 "elements": [
                     {
                         "type": "plain_text",
-                        "text": f"on {last_modified_at.strftime('%m-%d-%Y at %H:%M:%S')}",
+                        "text": f"on {last_modified_at.strftime('%m/%d/%Y at %H:%M:%S')}",
                     }
                 ]
             },
@@ -118,7 +111,7 @@ def generate_tasks_blocks(user_tasks, user):
                 "elements": [
                     {
                         "type": "plain_text",
-                        "text": f"on {created_at.strftime('%m-%d-%Y at %H:%M:%S')}",
+                        "text": f"on {created_at.strftime('%m/%d/%Y at %H:%M:%S')}",
                     }
                 ]
             },
@@ -126,6 +119,7 @@ def generate_tasks_blocks(user_tasks, user):
                 "type": "divider"
             }
         ]
+        task.insert(1, loads(user_task['description']))
         tasks.extend(task)
     return tasks
 
