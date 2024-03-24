@@ -1,12 +1,15 @@
 from ..helpers import create_task_modal
-def message_create_task(ack, body, client, logger):
+def message_create_task(ack, payload, client, logger):
     try:
         ack()
-        description = body['message']['blocks'][0]['elements'][0]['elements'][0]['text']
-        user = body['user']['id']
-        modal = create_task_modal(description, user)
+        message_blocks = payload["message"]['blocks']
+        for block in message_blocks:
+            if block["type"] == "rich_text":
+                description = block
+        user = payload['user']['id']
+        modal = create_task_modal(user, description)
         client.views_open(
-            trigger_id = body['trigger_id'],
+            trigger_id = payload['trigger_id'],
             view = modal
         )
     except Exception as e:

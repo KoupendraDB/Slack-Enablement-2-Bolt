@@ -5,6 +5,7 @@ from .login_button import login_button
 from .home_assignee_selector import home_assignee_selector
 from .task_status_selector import task_status_selector
 from .task_eta_selector import task_eta_selector
+from .delete_task import delete_task_action
 from .register_button import register_button
 
 def register(app):
@@ -15,3 +16,4 @@ def register(app):
     app.action(re.compile("assignee_selector-(.+)"))(home_assignee_selector)
     app.action(re.compile("task_status_selector-(.+)"))(task_status_selector)
     app.action(re.compile("task_eta_selector-(.+)"))(task_eta_selector)
+    app.action(re.compile("delete_task-(.+)"))(delete_task_action)

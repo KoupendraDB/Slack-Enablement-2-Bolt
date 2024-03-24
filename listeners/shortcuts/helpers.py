@@ -1,6 +1,8 @@
 from datetime import date
 
-def create_task_modal(message, user):
+default_description = {'type': 'rich_text', 'elements': []}
+
+def create_task_modal(user, description = default_description):
     modal = {
         "title": {
             "type": "plain_text",
@@ -37,7 +39,8 @@ def create_task_modal(message, user):
                     "placeholder": {
                         "type": "plain_text",
                         "text": "Task Description"
-                    }
+                    },
+                    "initial_value": description
                 },
                 "label": {
                     "type": "plain_text",

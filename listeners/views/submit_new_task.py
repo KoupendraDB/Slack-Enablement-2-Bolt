@@ -1,12 +1,13 @@
 from .helpers import submit_new_task_form_from_payload
 from services.backend.tasks import create_task
 
-def submit_new_task(ack, logger, client, body, context):
+def submit_new_task(ack, logger, body, context, say):
     try:
         form = submit_new_task_form_from_payload(body['view']['state']['values'])
         result = create_task(context['team_id'], context['user_id'], form)
         if result.get('success', False):
-            client.chat_postMessage(channel=context['user_id'], blocks=[
+            ack()
+            say(channel=context['user_id'], blocks=[
                 {
                     "type": "header",
                     "text": {
@@ -41,7 +42,11 @@ def submit_new_task(ack, logger, client, body, context):
                 }
             ],
             text = 'Task created successfully!')
-            ack()
+            if context['user_id'] != form['assignee']:
+                say(
+                    channel = form['assignee'],
+                    text=f"<@{context['user_id']}> has assigned you a task!"
+                )
         else:
             ack(
                 response_action = 'errors',
