@@ -4,9 +4,9 @@ from services.backend.login import login_user
 
 def login(ack, logger, client, body):
     try:
-        form = login_form_from_payload(body['view']['state']['values'])
         team = body['team']['id']
         user = body['user']['id']
+        form = login_form_from_payload(body['view']['state']['values'], user)
         if login_user(team, user, form):
             ack()
             handle_home_view(client, team, user)

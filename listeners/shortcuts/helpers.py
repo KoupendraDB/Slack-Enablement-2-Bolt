@@ -55,7 +55,6 @@ def create_task_modal(message, user):
                         "placeholder": {
                             "type": "plain_text",
                             "text": "Select a user",
-                            "emoji": True
                         },
                         "initial_user": user,
                         "action_id": "assignee_selector"
@@ -66,7 +65,6 @@ def create_task_modal(message, user):
                         "placeholder": {
                             "type": "plain_text",
                             "text": "Select a due date",
-                            "emoji": True
                         },
                         "action_id": "due_date_selector"
                     }

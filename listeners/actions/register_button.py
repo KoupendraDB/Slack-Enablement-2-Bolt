@@ -1,4 +1,4 @@
-def login_button(ack, client, body, logger):
+def register_button(ack, client, body, logger):
     try:
         ack()
         client.views_open(
@@ -6,13 +6,13 @@ def login_button(ack, client, body, logger):
             view = {
                 "title": {
                     "type": "plain_text",
-                    "text": "Log in to your account"
+                    "text": "Register an account"
                 },
                 "submit": {
                     "type": "plain_text",
-                    "text": "Login",
+                    "text": "Register",
                 },
-                "callback_id": "login",
+                "callback_id": "submit_register",
                 "blocks": [
                     {
                         "type": "input",
@@ -24,7 +24,7 @@ def login_button(ack, client, body, logger):
                                 "text": "Password"
                             }
                         },
-                        "block_id": "login_password_block",
+                        "block_id": "register_password_block",
                         "label": {
                             "type": "plain_text",
                             "text": "Password"
@@ -35,4 +35,4 @@ def login_button(ack, client, body, logger):
             }
         )
     except Exception as e:
-        logger.error(f"Error in login_button: {e}")
+        logger.error(f"Error in register_button: {e}")

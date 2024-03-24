@@ -7,11 +7,15 @@ with open('./config.json') as config_file:
 
 server = config['backend_server_uri']
 
-def make_request(name, request_type, data = {}, headers = {}):
+def make_request(name, request_type, data = {}, headers = {}, url_param = {}, params={}):
     headers['Accept'] = '*/*';
-    uri = server + endpointNames[name]
+    endpoint = endpointNames[name]
+    if len(url_param):
+        endpoint = endpoint.format(**url_param)
+    uri = server + endpoint
+    print(request_type, uri)
     if request_type == 'GET':
-        response = requests.get(uri, headers=headers)
+        response = requests.get(uri, headers=headers, params=params)
     elif request_type == 'DELETE':
         response = requests.delete(uri, headers=headers)
     elif request_type == 'POST':
@@ -19,5 +23,6 @@ def make_request(name, request_type, data = {}, headers = {}):
         response = requests.post(uri, data=json.dumps(data), headers=headers)
     elif request_type == 'PATCH':
         headers['Content-Type'] = 'application/json'
-        response = requests.patch(uri, data=data, headers=headers)
+        response = requests.patch(uri, data=json.dumps(data), headers=headers)
+    print(response)
     return response.json() if response else {}

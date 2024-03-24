@@ -7,9 +7,16 @@ def submit_new_task_form_from_payload(payload):
     }
     return form
 
-def login_form_from_payload(payload):
+def login_form_from_payload(payload, user):
     form = {
-        "username": payload['login_username_block']['username']['value'],
+        "username": user,
         "password": payload['login_password_block']['password']['value']
+    }
+    return form
+
+def register_form_from_payload(payload, user):
+    form = {
+        "username": user,
+        "password": payload['register_password_block']['password']['value']
     }
     return form

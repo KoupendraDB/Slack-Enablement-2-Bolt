@@ -1,5 +1,18 @@
 from services.backend.tasks import get_tasks
 
+def get_task_status_options():
+    tasks_statuses = ['Ready', 'In-Progress', 'Code Review', 'Deployed', 'QA', 'Rejected', 'Blocked', 'Accepted', 'Cancelled']
+    blocks = []
+    for status in tasks_statuses:
+        blocks.append({
+            "text": {
+                "type": "plain_text",
+                "text": status,
+            },
+            "value": status
+        })
+    return blocks
+    
 def generate_tasks_blocks(user_tasks, user):
     tasks = []
     for user_task in user_tasks:
@@ -29,7 +42,7 @@ def generate_tasks_blocks(user_tasks, user):
                             "text": "Assignee",
                         },
                         "initial_user": user,
-                        "action_id": "assignee_selector"
+                        "action_id": f"assignee_selector-{user_task['_id']}"
                     },
                     {
                         "type": "static_select",
@@ -37,37 +50,15 @@ def generate_tasks_blocks(user_tasks, user):
                             "type": "plain_text",
                             "text": "Status",
                         },
-                        "options": [
-                            {
-                                "text": {
-                                    "type": "plain_text",
-                                    "text": "Ready",
-                                },
-                                "value": "ready"
-                            },
-                            {
-                                "text": {
-                                    "type": "plain_text",
-                                    "text": "In-Progress",
-                                },
-                                "value": "progress"
-                            },
-                            {
-                                "text": {
-                                    "type": "plain_text",
-                                    "text": "QA",
-                                },
-                                "value": "qa"
-                            }
-                        ],
+                        "options": get_task_status_options(),
                         "initial_option": {
                             "text": {
                                 "type": "plain_text",
-                                "text": "Ready",
+                                "text": user_task['status'],
                             },
-                            "value": "ready"
+                            "value": user_task['status']
                         },
-                        "action_id": "static_select-action"
+                        "action_id": f"task_status_selector-{user_task['_id']}"
                     },
                     {
                         "type": "datepicker",
@@ -76,7 +67,7 @@ def generate_tasks_blocks(user_tasks, user):
                             "type": "plain_text",
                             "text": "To be done by",
                         },
-                        "action_id": "datepicker-action"
+                        "action_id": f"task_eta_selector-{user_task['_id']}"
                     }
                 ]
             },
@@ -139,6 +130,15 @@ def handle_home_view(client, team, user):
                                 },
                                 "value": "login",
                                 "action_id": "login_button"
+                            },
+                            {
+                                "type": "button",
+                                "text": {
+                                "type": "plain_text",
+                                "text": "Register now"
+                                },
+                                "value": "register",
+                                "action_id": "register_button"
                             }
                         ]
                     }
