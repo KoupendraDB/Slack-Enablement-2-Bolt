@@ -74,6 +74,7 @@ def create_task_modal(user, description = default_description):
             {
                 "type": "input",
                 "block_id": "file_input_block",
+                "optional": True,
                 "label": {
                     "type": "plain_text",
                     "text": "Upload Files"
