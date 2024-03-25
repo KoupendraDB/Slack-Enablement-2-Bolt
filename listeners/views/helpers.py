@@ -7,6 +7,12 @@ def submit_new_task_form_from_payload(payload):
         "eta_done": payload["selectors"]["due_date_selector"]['selected_date'],
         "description": json.dumps(payload['task_description_block']['task_description_input']['rich_text_value'])
     }
+    form['attachments'] = []
+    for file in payload['file_input_block']['file_attachments']['files']:
+        form['attachments'].append({
+            "name": file["name"],
+            "resource_url": file["url_private"]
+        })
     return form
 
 def login_form_from_payload(payload, user):

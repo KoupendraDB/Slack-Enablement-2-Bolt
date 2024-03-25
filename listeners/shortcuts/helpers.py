@@ -70,6 +70,18 @@ def create_task_modal(user, description = default_description):
                         "action_id": "due_date_selector"
                     }
                 ]
+            },
+            {
+                "type": "input",
+                "block_id": "file_input_block",
+                "label": {
+                    "type": "plain_text",
+                    "text": "Upload Files"
+                },
+                "element": {
+                    "type": "file_input",
+                    "action_id": "file_attachments",
+                },
             }
         ],
         "type": "modal"

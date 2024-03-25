@@ -6,6 +6,7 @@ def message_create_task(ack, payload, client, logger):
         for block in message_blocks:
             if block["type"] == "rich_text":
                 description = block
+                break
         user = payload['user']['id']
         modal = create_task_modal(user, description)
         client.views_open(
