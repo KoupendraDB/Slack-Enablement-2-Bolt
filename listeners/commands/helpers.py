@@ -12,15 +12,19 @@ def get_create_task_form_from_payload(text, user):
         elif line == 'Description:':
             line_number += 1
             description = []
+            new_field = False
             while line_number < len(lines):
-                line = lines[line_number]
+                line = lines[line_number].strip()
                 if line not in ['Title:', 'Assignee:', 'Due:']:
                     description.append(line + '\n')
+                    line_number += 1
                 else:
+                    new_field = True
                     break
-                line_number += 1
             form['description_type'] = 'mrkdwn'
             form['description'] = ''.join(description)
+            if new_field:
+                continue
         elif line == 'Assignee:':
             line_number += 1
             if line_number < len(lines):

@@ -1,6 +1,4 @@
 from services.backend.tasks import get_tasks
-from datetime import datetime
-from json import loads
 
 def get_task_status_options():
     tasks_statuses = ['Ready', 'In-Progress', 'Code Review', 'Deployed', 'QA', 'Rejected', 'Blocked', 'Accepted', 'Cancelled']
@@ -66,70 +64,43 @@ def get_action_elements(user, user_task):
         })
     return elements
 
+def generate_task_block(user_task, user):
+    task = [
+        {
+            "type": "section",
+            "block_id": f"task-{user_task['_id']}",
+            "text": {
+                "type": "mrkdwn",
+                "text": f"*{user_task['title']}*"
+            }
+        },
+        {
+			"type": "actions",
+			"elements": [{
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "View details",
+                    "emoji": True
+                },
+                "value": "details",
+                "action_id": f"task_details-{user_task['_id']}"
+            }]
+		},
+        {
+            "type": "actions",
+            "elements": get_action_elements(user, user_task)
+        },
+        {
+            "type": "divider"
+        }
+    ]
+    return task
+
 def generate_tasks_blocks(user_tasks, user):
     tasks = []
     for user_task in user_tasks:
-        last_modified_at = datetime.fromisoformat(user_task['last_modified_at'])
-        created_at = datetime.fromisoformat(user_task['created_at'])
-        task = [
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": f"*{user_task['title']}*"
-                }
-            },
-            {
-                "type": "actions",
-                "elements": get_action_elements(user, user_task)
-            },
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": f"Last modified by <@{user_task['last_modified_by']}>"
-                }
-            },
-            {
-                "type": "context",
-                "elements": [
-                    {
-                        "type": "plain_text",
-                        "text": f"on {last_modified_at.strftime('%m/%d/%Y at %H:%M:%S')}",
-                    }
-                ]
-            },
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": f"Created by <@{user_task['created_by']}>"
-                }
-            },
-            {
-                "type": "context",
-                "elements": [
-                    {
-                        "type": "plain_text",
-                        "text": f"on {created_at.strftime('%m/%d/%Y at %H:%M:%S')}",
-                    }
-                ]
-            },
-            {
-                "type": "divider"
-            }
-        ]
-        if user_task.get('description_type', '') == 'mrkdwn':
-            description = {
-                            "type": "section",
-                            "text": {
-                                "type": "mrkdwn",
-                                "text": user_task['description']
-                            }
-                        }
-        else:
-            description = loads(user_task['description'])
-        task.insert(1, description)
+        task = generate_task_block(user_task, user)
         tasks.extend(task)
     return tasks
 

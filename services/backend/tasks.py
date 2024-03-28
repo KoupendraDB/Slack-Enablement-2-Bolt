@@ -41,3 +41,13 @@ def delete_task(task_id, workspace, user):
         url_param={'task_id': task_id}
     )
     return result
+
+def get_task(task_id, workspace, user):
+    jwt = fetch_user_jwt(workspace, user)
+    result = make_request(
+        name='GET_TASK',
+        request_type='GET',
+        headers={'bearer-token': jwt},
+        url_param={'task_id': task_id}
+    )
+    return result
