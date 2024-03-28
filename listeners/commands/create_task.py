@@ -2,7 +2,6 @@ from .helpers import get_create_task_form_from_payload
 from services.backend.tasks import create_task
 
 def command_create_task(ack, respond, command):
-    print(command)
     form = get_create_task_form_from_payload(command['text'], command['user_id'])
     ack()
     if form:
