@@ -1,7 +1,9 @@
 from services.backend.tasks import get_tasks
+from datetime import date
+
+tasks_statuses = ['Ready', 'In-Progress', 'Code Review', 'Deployed', 'QA', 'Rejected', 'Blocked', 'Accepted', 'Cancelled']
 
 def get_task_status_options():
-    tasks_statuses = ['Ready', 'In-Progress', 'Code Review', 'Deployed', 'QA', 'Rejected', 'Blocked', 'Accepted', 'Cancelled']
     blocks = []
     for status in tasks_statuses:
         blocks.append({
@@ -98,11 +100,35 @@ def generate_task_block(user_task, user):
     return task
 
 def generate_tasks_blocks(user_tasks, user):
-    tasks = []
+    tasks_by_status = {}
     for user_task in user_tasks:
-        task = generate_task_block(user_task, user)
-        tasks.extend(task)
-    return tasks
+        if user_task['status'] not in tasks_by_status:
+            tasks_by_status[user_task['status']] = []
+        tasks_by_status[user_task['status']].append(user_task)
+    
+    blocks = []
+    for status in tasks_statuses:
+        if status in tasks_by_status:
+            blocks.extend([
+                {
+                    "type": "divider"
+                },
+                {
+                    "type": "header",
+                    "text": {
+                        "type": "plain_text",
+                        "text": status,
+                    }
+		        },
+                {
+                    "type": "divider"
+                }
+            ])
+            sorted_tasks = sorted(tasks_by_status[status], key = lambda t: date.fromisoformat(t['eta_done']))
+            for status_task in sorted_tasks:
+                task = generate_task_block(status_task, user)
+                blocks.extend(task)
+    return blocks
 
 def handle_home_view(client, team, user):
     tasks_response = get_tasks(team, user)
