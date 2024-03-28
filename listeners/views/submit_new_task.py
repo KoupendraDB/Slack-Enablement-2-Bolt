@@ -1,7 +1,7 @@
 from .helpers import submit_new_task_form_from_payload
 from services.backend.tasks import create_task
 
-def submit_new_task(ack, logger, body, context, say):
+def submit_new_task(ack, logger, body, context, client):
     try:
         form = submit_new_task_form_from_payload(body['view']['state']['values'])
         ack()
@@ -25,7 +25,7 @@ def submit_new_task(ack, logger, body, context, say):
                                 }
                             ]
             if context['user_id'] != form['assignee']:
-                say(
+                client.chat_postMessage(
                     channel = form['assignee'],
                     text=f"<@{context['user_id']}> has assigned you a task!"
                 )
@@ -50,8 +50,9 @@ def submit_new_task(ack, logger, body, context, say):
                             ]
             message_text = 'Failed to create task!'
 
-        say(
+        client.chat_postEphemeral(
             channel=context['user_id'],
+            user=context['user_id'],
             blocks=[
                 {
                     "type": "rich_text",

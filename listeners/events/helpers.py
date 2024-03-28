@@ -119,7 +119,17 @@ def generate_tasks_blocks(user_tasks, user):
                 "type": "divider"
             }
         ]
-        task.insert(1, loads(user_task['description']))
+        if user_task.get('description_type', '') == 'mrkdwn':
+            description = {
+                            "type": "section",
+                            "text": {
+                                "type": "mrkdwn",
+                                "text": user_task['description']
+                            }
+                        }
+        else:
+            description = loads(user_task['description'])
+        task.insert(1, description)
         tasks.extend(task)
     return tasks
 
