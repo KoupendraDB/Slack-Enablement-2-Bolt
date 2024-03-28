@@ -1,4 +1,4 @@
-def register_button(ack, client, body, logger):
+def register_button(ack, client, body, logger, context):
     try:
         ack()
         client.views_open(
@@ -14,6 +14,13 @@ def register_button(ack, client, body, logger):
                 },
                 "callback_id": "submit_register",
                 "blocks": [
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": f"Username: *{context['user_id']}*"
+                        }
+                    },
                     {
                         "type": "input",
                         "element": {

@@ -1,4 +1,4 @@
-def login_button(ack, client, body, logger):
+def login_button(ack, client, body, logger, context):
     try:
         ack()
         client.views_open(
@@ -14,6 +14,13 @@ def login_button(ack, client, body, logger):
                 },
                 "callback_id": "login",
                 "blocks": [
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": f"Username: *{context['user_id']}*"
+                        }
+                    },
                     {
                         "type": "input",
                         "element": {
