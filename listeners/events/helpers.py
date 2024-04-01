@@ -99,9 +99,16 @@ def generate_task_block(user_task, user):
     ]
     return task
 
-def generate_tasks_blocks(user_tasks, user):
+def generate_tasks_blocks(user_tasks, user, selected_status):
     tasks_by_status = {}
-    for user_task in user_tasks:
+    tasks = []
+    for task in user_tasks: 
+        if selected_status:
+            if (task['status'] == selected_status):
+                tasks.append(task)
+        else:
+            tasks.append(task)
+    for user_task in tasks:
         if user_task['status'] not in tasks_by_status:
             tasks_by_status[user_task['status']] = []
         tasks_by_status[user_task['status']].append(user_task)
@@ -109,31 +116,62 @@ def generate_tasks_blocks(user_tasks, user):
     blocks = []
     for status in tasks_statuses:
         if status in tasks_by_status:
-            blocks.extend([
-                {
-                    "type": "divider"
-                },
-                {
-                    "type": "header",
-                    "text": {
-                        "type": "plain_text",
-                        "text": status,
+            if not selected_status:
+                blocks.extend([
+                    {
+                        "type": "divider"
+                    },
+                    {
+                        "type": "header",
+                        "text": {
+                            "type": "plain_text",
+                            "text": status,
+                        }
+                    },
+                    {
+                        "type": "divider"
                     }
-		        },
-                {
-                    "type": "divider"
-                }
-            ])
+                ])
             sorted_tasks = sorted(tasks_by_status[status], key = lambda t: date.fromisoformat(t['eta_done']))
             for status_task in sorted_tasks:
                 task = generate_task_block(status_task, user)
                 blocks.extend(task)
     return blocks
 
-def handle_home_view(client, team, user):
+def generate_status_buttons(tasks, selected_status):
+    status_count = {}
+    for task in tasks:
+        status_count[task['status']] = status_count.get(task['status'], 0) + 1
+
+    elements = []
+    for status in tasks_statuses:
+        count = status_count.get(status, 0)
+        if count > 0:
+            button = {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": f"{status} ({status_count.get(status, 0)})"
+                },
+                "value": f"{status}",
+                "action_id": f"home_task_status-{status}",
+            }
+            if status == selected_status:
+                button['style'] = 'primary'
+            elements.append(button)
+
+    actions = {
+        "type": "actions",
+        "elements": elements
+    }
+
+    return actions
+
+def handle_home_view(client, team, user, selected_status = None):
     tasks_response = get_tasks(team, user)
     if tasks_response.get('success', False):
-        task_blocks = generate_tasks_blocks(tasks_response['tasks'], user)
+        status_buttons = generate_status_buttons(tasks_response['tasks'], selected_status)
+        task_blocks = generate_tasks_blocks(tasks_response['tasks'], user, selected_status)
         blocks = [
             {
                 "type": "section",
@@ -157,6 +195,13 @@ def handle_home_view(client, team, user):
                 "type": "divider"
             }
         ]
+        if len(status_buttons['elements']) > 0:
+            blocks.extend([
+                status_buttons,
+                {
+                    "type": "divider"
+                }
+            ])
         blocks.extend(task_blocks)
         client.views_publish(
             user_id=user,
