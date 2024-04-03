@@ -15,6 +15,13 @@ def task_detail_modal(ack, body, client, context, action):
 			    "type": "divider"
 		    },
             {
+                "type": "header",
+                "text": {
+                    "type": "plain_text",
+                    "text": f"{result['task']['title']}",
+                }
+            },
+            {
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
@@ -46,7 +53,7 @@ def task_detail_modal(ack, body, client, context, action):
                 "type": "modal",
                 "title": {
                     "type": "plain_text",
-                    "text": f"{result['task']['title']}"
+                    "text": "Task"
                 },
                 "close": {
                     "type": "plain_text",
