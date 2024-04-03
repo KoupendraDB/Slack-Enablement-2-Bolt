@@ -193,6 +193,34 @@ def handle_home_view(client, team, user, selected_status = None):
             },
             {
                 "type": "divider"
+            },
+            {
+                "type": "actions",
+                "elements": [
+                    {
+                        "type": "button",
+                        "style": "primary",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "Create a task :heavy_plus_sign:",
+                            "emoji": True
+                        },
+                        "action_id": "create_task",
+                    },
+                    {
+                        "type": "button",
+                        "style": "primary",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "Search tasks :mag:",
+                            "emoji": True
+                        },
+                        "action_id": "search_tasks",
+                    }
+                ]
+            },
+            {
+                "type": "divider"
             }
         ]
         if len(status_buttons['elements']) > 0:
