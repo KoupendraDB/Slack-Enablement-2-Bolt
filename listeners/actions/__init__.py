@@ -12,6 +12,7 @@ from .refresh_home import refresh_home
 from .home_task_status import home_task_status
 from .create_task import create_task
 from .search_tasks import search_tasks
+from .task_detail_modal import task_detail_modal
 
 def register(app):
     app.action("assignee_selector")(assignee_selector)
@@ -31,3 +32,4 @@ def register(app):
     app.action(re.compile("delete_task-(.+)"))(delete_task_action)
     app.action(re.compile("task_details-(.+)"))(task_details)
     app.action(re.compile("home_task_status-(.+)"))(home_task_status)
+    app.action(re.compile("task_detail_modal-(.+)"))(task_detail_modal)
