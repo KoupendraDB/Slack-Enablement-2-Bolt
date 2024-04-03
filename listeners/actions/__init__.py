@@ -11,14 +11,20 @@ from .register_button import register_button
 from .refresh_home import refresh_home
 from .home_task_status import home_task_status
 from .create_task import create_task
+from .search_tasks import search_tasks
 
 def register(app):
     app.action("assignee_selector")(assignee_selector)
     app.action("due_date_selector")(due_date_selector)
+    app.action("min_due_date")(due_date_selector)
+    app.action("max_due_date")(due_date_selector)
+    app.action("min_created_date")(due_date_selector)
+    app.action("min_created_date")(due_date_selector)
     app.action("login_button")(login_button)
     app.action("register_button")(register_button)
     app.action("refresh_home")(refresh_home)
     app.action("create_task")(create_task)
+    app.action("search_tasks")(search_tasks)
     app.action(re.compile("assignee_selector-(.+)"))(home_assignee_selector)
     app.action(re.compile("task_status_selector-(.+)"))(task_status_selector)
     app.action(re.compile("task_eta_selector-(.+)"))(task_eta_selector)

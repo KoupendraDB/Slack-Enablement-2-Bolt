@@ -174,25 +174,11 @@ def handle_home_view(client, team, user, selected_status = None):
         task_blocks = generate_tasks_blocks(tasks_response['tasks'], user, selected_status)
         blocks = [
             {
-                "type": "section",
+                "type": "header",
                 "text": {
-                    "type": "mrkdwn",
-                    "text": f"*{len(tasks_response['tasks'])} task(s) assigned to you*"
-                },
-                "accessory": {
-                    "type": "button",
-                    "style": "primary",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "Refresh :arrows_clockwise:",
-                        "emoji": True
-                    },
-                    "value": "refresh",
-                    "action_id": "refresh_home"
+                    "type": "plain_text",
+                    "text": f"{len(tasks_response['tasks'])} task(s) assigned to you"
                 }
-            },
-            {
-                "type": "divider"
             },
             {
                 "type": "actions",
@@ -216,11 +202,19 @@ def handle_home_view(client, team, user, selected_status = None):
                             "emoji": True
                         },
                         "action_id": "search_tasks",
+                    },
+                    {
+                        "type": "button",
+                        "style": "primary",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "Refresh :arrows_clockwise:",
+                            "emoji": True
+                        },
+                        "value": "refresh",
+                        "action_id": "refresh_home"
                     }
                 ]
-            },
-            {
-                "type": "divider"
             }
         ]
         if len(status_buttons['elements']) > 0:
