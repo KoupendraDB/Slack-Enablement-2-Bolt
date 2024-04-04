@@ -27,7 +27,27 @@ def submit_new_task(ack, logger, body, context, client):
             if context['user_id'] != form['assignee']:
                 client.chat_postMessage(
                     channel = form['assignee'],
-                    text=f"<@{context['user_id']}> has assigned you a task!"
+                    text=f"<@{context['user_id']}> has assigned you a task!",
+                    blocks = [
+                        {
+                            "type": "section",
+                            "text": {
+                                "type": "mrkdwn",
+                                "text": f"<@{context['user_id']}> has assigned you a task!"
+                            },
+                            "accessory": {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "View :thinking_face:",
+                                    "emoji": True
+                                },
+                                "value": result['task_id'],
+                                "action_id": f"view_task_from_message-{result['task_id']}"
+                            }
+                        }
+                    ]
+
                 )
             message_text = 'Task created successfully!'
         else:

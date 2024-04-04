@@ -15,7 +15,26 @@ def home_assignee_selector(ack, payload, context, client, say):
         handle_home_view(client, team, user)
         say(
             channel=new_assignee,
-            text=f"<@{user}> has assigned you a task!"
+            text = f"<@{user}> has assigned you a task!",
+            blocks = [
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": f"<@{user}> has assigned you a task!"
+                    },
+                    "accessory": {
+                        "type": "button",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "View :thinking_face:",
+                            "emoji": True
+                        },
+                        "value": task_id,
+                        "action_id": f"view_task_from_message-{task_id}"
+                    }
+                }
+            ]
         )
     else:
         ack(
