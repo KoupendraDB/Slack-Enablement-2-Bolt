@@ -5,5 +5,6 @@ names = {
     'DELETE_TASK': '/task/{task_id}',
     'GET_TASKS': '/tasks',
     'LOGIN': '/login',
-    'REGISTER': '/user'
+    'REGISTER': '/user',
+    'GET_USER_PROJECTS': '/projects'
 }

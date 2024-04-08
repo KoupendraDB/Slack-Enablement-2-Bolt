@@ -1,6 +1,5 @@
 from datetime import date
 from services.backend.tasks import get_task
-from .task_details import get_task_details
 
 def create_task_detail_modal(task):
     blocks = [
@@ -39,7 +38,6 @@ def create_task_detail_modal(task):
             "type": "divider"
         }
     ]
-    blocks.extend(get_task_details(task))
     view = {
         "type": "modal",
         "title": {
