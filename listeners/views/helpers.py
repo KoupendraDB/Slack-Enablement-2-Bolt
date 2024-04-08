@@ -1,18 +1,16 @@
 import json
 
-def submit_new_task_form_from_payload(payload):
+def task_form_from_payload(payload, fallback_assignee):
     form = {
         "title": payload['task_title_block']['task_title_input']['value'],
-        "assignee": payload["selectors"]["assignee_selector"]['selected_user'],
-        "eta_done": payload["selectors"]["due_date_selector"]['selected_date'],
+        "status": payload["selectors"]["task_modal_status_selector"]['selected_option']['value'],
+        "eta_done": payload["selectors"]["task_modal_due_date_selector"]['selected_date'],
         "description": json.dumps(payload['task_description_block']['task_description_input']['rich_text_value'])
     }
-    form['attachments'] = []
-    for file in payload['file_input_block']['file_attachments']['files']:
-        form['attachments'].append({
-            "name": file["name"],
-            "resource_url": file["url_private"]
-        })
+    if payload['selectors'].get('task_modal_assignee_selector', False):
+        form["assignee"] = payload["selectors"]["task_modal_assignee_selector"]['selected_user']
+    else:
+        form["assignee"] = fallback_assignee
     return form
 
 def login_form_from_payload(payload, user):

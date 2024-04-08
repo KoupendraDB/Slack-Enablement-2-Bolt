@@ -1,9 +1,9 @@
-from .helpers import submit_new_task_form_from_payload
+from .helpers import task_form_from_payload
 from services.backend.tasks import create_task
 
 def submit_new_task(ack, logger, body, context, client):
     try:
-        form = submit_new_task_form_from_payload(body['view']['state']['values'])
+        form = task_form_from_payload(body['view']['state']['values'], context['user_id'])
         ack()
         result = create_task(context['team_id'], context['user_id'], form)
         if result.get('success', False):

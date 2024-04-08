@@ -1,4 +1,5 @@
-from ..helpers import create_task_modal
+from ...actions.task_modal import get_create_task_modal
+
 def message_create_task(ack, payload, client, logger):
     try:
         ack()
@@ -8,7 +9,7 @@ def message_create_task(ack, payload, client, logger):
                 description = block
                 break
         user = payload['user']['id']
-        modal = create_task_modal(user, description)
+        modal = get_create_task_modal(user, None, description)
         client.views_open(
             trigger_id = payload['trigger_id'],
             view = modal

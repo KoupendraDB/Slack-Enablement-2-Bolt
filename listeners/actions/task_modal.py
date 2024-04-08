@@ -106,7 +106,7 @@ def get_update_task_modal(user, user_task, task_id):
     modal['blocks'].append(action_elements)
     return modal
 
-def get_create_task_modal(user, project = None):
+def get_create_task_modal(user, project = None, description = {'type': 'rich_text', 'elements': []}):
     modal = {
         "title": {
             "type": "plain_text",
@@ -143,7 +143,8 @@ def get_create_task_modal(user, project = None):
                     "placeholder": {
                         "type": "plain_text",
                         "text": "Task Description"
-                    }
+                    },
+                    "initial_value": description
                 },
                 "label": {
                     "type": "plain_text",
