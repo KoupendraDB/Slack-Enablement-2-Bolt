@@ -38,7 +38,7 @@ def submit_update_task(ack, logger, body, context, client, payload, say):
             ack(
                 response_action = 'errors',
                 errors = {
-                    payload['block_id']: result.get('message', 'Invalid assignee!')
+                    payload['title']: result.get('message', 'Check inputs!')
                 }
             )
     except Exception as e:
