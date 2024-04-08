@@ -1,4 +1,4 @@
-from .helper import store_user_jwt
+from .jwt import store_user_jwt
 from .request import make_request
 
 def login_user(workspace, user, payload):

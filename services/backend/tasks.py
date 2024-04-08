@@ -1,4 +1,4 @@
-from .helper import fetch_user_jwt
+from .jwt import fetch_user_jwt
 from .request import make_request
 from bson import ObjectId
 
