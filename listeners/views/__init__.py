@@ -1,5 +1,6 @@
 import re
 from .submit_new_task import submit_new_task
+from .submit_create_project import submit_create_project
 from .submit_delete_task import submit_delete_task
 from .submit_update_task import submit_update_task
 from .login import login
@@ -8,6 +9,7 @@ from .search_tasks import search_tasks
 
 def register(app):
     app.view("submit_new_task")(submit_new_task)
+    app.view("submit_create_project")(submit_create_project)
     app.view("login")(login)
     app.view("submit_register")(submit_register)
     app.view("search_tasks")(search_tasks)

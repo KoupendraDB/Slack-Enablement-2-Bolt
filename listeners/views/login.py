@@ -1,4 +1,4 @@
-from .helpers import login_form_from_payload
+from .payload_helper import login_form_from_payload
 from ..events.helpers import handle_home_view
 from services.backend.login import login_user
 

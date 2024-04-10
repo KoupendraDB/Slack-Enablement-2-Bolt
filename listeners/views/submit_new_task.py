@@ -1,4 +1,4 @@
-from .helpers import task_form_from_payload
+from .payload_helper import task_form_from_payload
 from services.backend.tasks import create_task
 
 def submit_new_task(ack, logger, body, context, client):

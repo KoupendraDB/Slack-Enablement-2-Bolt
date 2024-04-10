@@ -1,4 +1,4 @@
-from .helpers import register_form_from_payload
+from .payload_helper import register_form_from_payload
 from ..events.helpers import handle_home_view
 from services.backend.register import register_user
 

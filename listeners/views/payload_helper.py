@@ -46,3 +46,12 @@ def search_form_from_payload(payload):
     if payload['created_date']['max_created_date']['selected_date']:
         form['created_at_$lte'] = payload['created_date']['max_created_date']['selected_date']
     return form
+
+def project_form_from_payload(payload):
+    return {
+        'name': payload['project_name']['project_name']['value'],
+        'channel': payload['channel_name']['channel_name']['value'],
+        'project_manager': payload['project_manager']['project_manager']['selected_user'],
+        'developers': payload['developers']['developers']['selected_users'],
+        'qas': payload['qas']['qas']['selected_users'],
+    }
