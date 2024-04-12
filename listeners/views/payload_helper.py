@@ -23,7 +23,8 @@ def login_form_from_payload(payload, user):
 def register_form_from_payload(payload, user):
     form = {
         "username": user,
-        "password": payload['register_password_block']['password']['value']
+        "password": payload['register_password_block']['password']['value'],
+        "role": payload['user_role']['user_role']['selected_option']['value']
     }
     return form
 
@@ -51,7 +52,7 @@ def project_form_from_payload(payload):
     return {
         'name': payload['project_name']['project_name']['value'],
         'channel': payload['channel_name']['channel_name']['value'],
-        'project_manager': payload['project_manager']['project_manager']['selected_user'],
-        'developers': payload['developers']['developers']['selected_users'],
-        'qas': payload['qas']['qas']['selected_users'],
+        'project_manager': payload['project_manager']['project_manager']['selected_option']['value'],
+        'developers': [option['value'] for option in payload['developers']['developers']['selected_options']],
+        'qas': [option['value'] for option in payload['qas']['qas']['selected_options']],
     }

@@ -35,7 +35,8 @@ def get_create_project_modal():
                 "type": "input",
                 "block_id": "project_manager",
                 "element": {
-                    "type": "users_select",
+                    "type": "external_select",
+                    "min_query_length": 0,
                     "placeholder": {
                         "type": "plain_text",
                         "text": "Select Project Manager"
@@ -51,7 +52,8 @@ def get_create_project_modal():
                 "type": "input",
                 "block_id": "developers",
                 "element": {
-                    "type": "multi_users_select",
+                    "type": "multi_external_select",
+                    "min_query_length": 0,
                     "placeholder": {
                         "type": "plain_text",
                         "text": "Select developers"
@@ -67,7 +69,8 @@ def get_create_project_modal():
                 "type": "input",
                 "block_id": "qas",
                 "element": {
-                    "type": "multi_users_select",
+                    "type": "multi_external_select",
+                    "min_query_length": 0,
                     "placeholder": {
                         "type": "plain_text",
                         "text": "Select QAs"

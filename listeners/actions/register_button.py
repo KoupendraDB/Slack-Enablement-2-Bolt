@@ -1,3 +1,27 @@
+role_options = [
+    {
+        "text": {
+            "type": "plain_text",
+            "text": "Project Manager",
+        },
+        "value": "project_manager"
+    },
+    {
+        "text": {
+            "type": "plain_text",
+            "text": "Developer",
+        },
+        "value": "developer"
+    },
+    {
+        "text": {
+            "type": "plain_text",
+            "text": "QA",
+        },
+        "value": "qa"
+    }
+]
+
 def register_button(ack, client, body, logger, context):
     try:
         ack()
@@ -19,6 +43,23 @@ def register_button(ack, client, body, logger, context):
                         "text": {
                             "type": "mrkdwn",
                             "text": f"Username: *{context['user_id']}*"
+                        }
+                    },
+                    {
+                        "type": "input",
+                        "block_id": "user_role",
+                        "element": {
+                            "type": "static_select",
+                            "placeholder": {
+                                "type": "plain_text",
+                                "text": "Select a role",
+                            },
+                            "options": role_options,
+                            "action_id": "user_role"
+                        },
+                        "label": {
+                            "type": "plain_text",
+                            "text": "Role",
                         }
                     },
                     {

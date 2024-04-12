@@ -13,7 +13,6 @@ def get_tasks(workspace, user, project):
         headers={'bearer-token': jwt},
         params=params
     )
-    print(params)
     return result
 
 def update_task(task_id, workspace, user, payload):

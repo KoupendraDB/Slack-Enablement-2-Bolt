@@ -7,5 +7,6 @@ names = {
     'LOGIN': '/login',
     'REGISTER': '/user',
     'GET_USER_PROJECTS': '/projects/{user_id}',
-    'CREATE_PROJECT': '/projects'
+    'CREATE_PROJECT': '/projects',
+    'SEARCH_USERS': '/users'
 }

@@ -7,6 +7,8 @@ def submit_register(ack, logger, client, body):
         team = body['team']['id']
         user = body['user']['id']
         form = register_form_from_payload(body['view']['state']['values'], user)
+        user_info = client.users_info(user = user)
+        form['name'] = user_info['user']['real_name']
         result = register_user(form)
         if result.get('success', False):
             ack()
