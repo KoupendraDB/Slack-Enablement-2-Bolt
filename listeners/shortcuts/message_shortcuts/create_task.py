@@ -1,6 +1,6 @@
 from ...actions.task_modal import get_create_task_modal
 
-def message_create_task(ack, payload, client, logger):
+def message_create_task(ack, payload, client, logger, context):
     try:
         ack()
         message_blocks = payload["message"]['blocks']
@@ -8,8 +8,7 @@ def message_create_task(ack, payload, client, logger):
             if block["type"] == "rich_text":
                 description = block
                 break
-        user = payload['user']['id']
-        modal = get_create_task_modal(user, None, description)
+        modal = get_create_task_modal(context, client, None, description)
         client.views_open(
             trigger_id = payload['trigger_id'],
             view = modal

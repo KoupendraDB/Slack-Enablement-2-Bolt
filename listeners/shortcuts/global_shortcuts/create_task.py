@@ -1,10 +1,9 @@
 from ...actions.task_modal import get_create_task_modal
 
-def global_create_task(ack, body, client, logger):
+def global_create_task(ack, body, client, logger, context):
     try:
         ack()
-        user = body['user']['id']
-        modal = get_create_task_modal(user)
+        modal = get_create_task_modal(context, client)
         client.views_open(
             trigger_id = body['trigger_id'],
             view = modal

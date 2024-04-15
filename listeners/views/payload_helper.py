@@ -1,6 +1,6 @@
 import json
 
-def task_form_from_payload(payload, fallback_assignee):
+def task_form_from_payload(payload, fallback_assignee, project = None):
     form = {
         "title": payload['task_title_block']['task_title_input']['value'],
         "status": payload["selectors"]["task_modal_status_selector"]['selected_option']['value'],
@@ -8,9 +8,11 @@ def task_form_from_payload(payload, fallback_assignee):
         "description": json.dumps(payload['task_description_block']['task_description_input']['rich_text_value'])
     }
     if payload['selectors'].get('task_modal_assignee_selector', False):
-        form["assignee"] = payload["selectors"]["task_modal_assignee_selector"]['selected_user']
+        form["assignee"] = payload["selectors"]["task_modal_assignee_selector"]['selected_option']['value']
     else:
         form["assignee"] = fallback_assignee
+    if project:
+        form['project'] = project
     return form
 
 def login_form_from_payload(payload, user):

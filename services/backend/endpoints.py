@@ -6,7 +6,8 @@ names = {
     'GET_TASKS': '/tasks',
     'LOGIN': '/login',
     'REGISTER': '/user',
-    'GET_USER_PROJECTS': '/projects/{user_id}',
-    'CREATE_PROJECT': '/projects',
+    'GET_USER_PROJECTS': '/{user_id}/projects',
+    'CREATE_PROJECT': '/project',
+    'GET_PROJECT': '/project/{project_id}',
     'SEARCH_USERS': '/users'
 }

@@ -1,7 +1,7 @@
 from services.backend.users import get_users
 
 def developers(ack, payload):
-    result = get_users({'role': 'developer', 'name': payload['value']})
+    result = get_users({'role': 'developer', 'name': {'$regex': payload['value']}})
     users = result.get('users', [])
     ack(options=[
         {

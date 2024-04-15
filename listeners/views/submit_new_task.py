@@ -1,29 +1,30 @@
 from .payload_helper import task_form_from_payload
 from services.backend.tasks import create_task
 
-def submit_new_task(ack, logger, body, context, client):
+def submit_new_task(ack, logger, body, context, client, payload):
     try:
-        form = task_form_from_payload(body['view']['state']['values'], context['user_id'])
+        project = payload['callback_id'].replace('submit_new_task', '').replace('-', '')
+        form = task_form_from_payload(body['view']['state']['values'], context['user_id'], project)
         ack()
         result = create_task(context['team_id'], context['user_id'], form)
         if result.get('success', False):
             message_elements = [
-                                {
-                                    "type": "text",
-                                    "text": "New task "
-                                },
-                                {
-                                    "type": "text",
-                                    "text": form['title'],
-                                    "style": {
-                                        "code": True
-                                    }
-                                },
-                                {
-                                    "type": "text",
-                                    "text": " has been created successfully!"
-                                }
-                            ]
+                {
+                    "type": "text",
+                    "text": "New task "
+                },
+                {
+                    "type": "text",
+                    "text": form['title'],
+                    "style": {
+                        "code": True
+                    }
+                },
+                {
+                    "type": "text",
+                    "text": " has been created successfully!"
+                }
+            ]
             if context['user_id'] != form['assignee']:
                 client.chat_postMessage(
                     channel = form['assignee'],
@@ -47,27 +48,26 @@ def submit_new_task(ack, logger, body, context, client):
                             }
                         }
                     ]
-
                 )
             message_text = 'Task created successfully!'
         else:
             message_elements = [
-                                {
-                                    "type": "text",
-                                    "text": "Failed to create task "
-                                },
-                                {
-                                    "type": "text",
-                                    "text": form['title'],
-                                    "style": {
-                                        "code": True
-                                    }
-                                },
-                                {
-                                    "type": "text",
-                                    "text": ". Please log in!"
-                                },
-                            ]
+                {
+                    "type": "text",
+                    "text": "Failed to create task "
+                },
+                {
+                    "type": "text",
+                    "text": form['title'],
+                    "style": {
+                        "code": True
+                    }
+                },
+                {
+                    "type": "text",
+                    "text": ". Please log in!"
+                },
+            ]
             message_text = 'Failed to create task!'
 
         client.chat_postEphemeral(

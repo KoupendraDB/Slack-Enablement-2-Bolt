@@ -4,6 +4,6 @@ def get_users(payload):
     result = make_request(
         name='SEARCH_USERS',
         request_type='GET',
-        params=payload
+        data=payload
     )
     return result

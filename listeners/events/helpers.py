@@ -1,5 +1,6 @@
 from services.backend.tasks import get_tasks
 from services.backend.projects import get_user_projects
+from services.backend.roles import fetch_user_role
 from datetime import date, datetime
 from json import loads
 
@@ -231,51 +232,61 @@ def handle_home_view(client, team, user, selected_project = None, selected_statu
         status_buttons = generate_status_buttons(tasks_response['tasks'], selected_project, selected_status)
         projects_buttons = generate_projects_buttons(project_response['projects'], selected_project)
         task_blocks = generate_tasks_blocks(tasks_response['tasks'], user, selected_status)
+        user_role = fetch_user_role(team, user)
+        main_action_buttons = [
+            {
+                "type": "button",
+                "style": "primary",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Create a task :heavy_plus_sign:",
+                    "emoji": True
+                },
+                "action_id": "create_task",
+            },
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Refresh :arrows_clockwise:",
+                    "emoji": True
+                },
+                "value": "refresh",
+                "action_id": "refresh_home"
+            }
+        ]
+
+        if selected_project:
+            main_action_buttons[0]['value'] = selected_project
+
+        if user_role in ['admin', 'project_manager']:
+            main_action_buttons.insert(1, {
+                "type": "button",
+                "style": "primary",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Join a Project :technologist:",
+                    "emoji": True
+                },
+                "action_id": "join_project",
+            })
+
+        if user_role == 'admin':
+            main_action_buttons.insert(1, {
+                "type": "button",
+                "style": "primary",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Create a Project :notebook:",
+                    "emoji": True
+                },
+                "action_id": "create_project",
+            })
+        
         blocks = [
             {
                 "type": "actions",
-                "elements": [
-                    {
-                        "type": "button",
-                        "style": "primary",
-                        "text": {
-                            "type": "plain_text",
-                            "text": "Create a task :heavy_plus_sign:",
-                            "emoji": True
-                        },
-                        "action_id": "create_task",
-                    },
-                    {
-                        "type": "button",
-                        "style": "primary",
-                        "text": {
-                            "type": "plain_text",
-                            "text": "Create a Project :notebook:",
-                            "emoji": True
-                        },
-                        "action_id": "create_project",
-                    },
-                    {
-                        "type": "button",
-                        "style": "primary",
-                        "text": {
-                            "type": "plain_text",
-                            "text": "Join a Project :technologist:",
-                            "emoji": True
-                        },
-                        "action_id": "join_project",
-                    },
-                    {
-                        "type": "button",
-                        "text": {
-                            "type": "plain_text",
-                            "text": "Refresh :arrows_clockwise:",
-                            "emoji": True
-                        },
-                        "value": "refresh",
-                        "action_id": "refresh_home"
-                    }
-                ]
+                "elements": main_action_buttons
             },
             {
                 "type": "divider"

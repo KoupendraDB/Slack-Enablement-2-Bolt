@@ -9,6 +9,7 @@ from .search_tasks import search_tasks
 
 def register(app):
     app.view("submit_new_task")(submit_new_task)
+    app.view(re.compile("submit_new_task-(.+)"))(submit_new_task)
     app.view("submit_create_project")(submit_create_project)
     app.view("login")(login)
     app.view("submit_register")(submit_register)

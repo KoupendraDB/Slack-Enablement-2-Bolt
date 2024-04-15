@@ -20,3 +20,13 @@ def create_project(workspace, user, payload):
         data=payload
     )
     return result
+
+def get_project(workspace, user, project_id):
+    jwt = fetch_user_jwt(workspace, user)
+    result = make_request(
+        name='GET_PROJECT',
+        request_type='GET',
+        headers={'bearer-token': jwt},
+        url_param={'project_id': project_id}
+    )
+    return result
