@@ -30,3 +30,14 @@ def get_project(workspace, user, project_id):
         url_param={'project_id': project_id}
     )
     return result
+
+def update_project(workspace, user, project_id, payload):
+    jwt = fetch_user_jwt(workspace, user)
+    result = make_request(
+        name='UPDATE_PROJECT',
+        request_type='PATCH',
+        headers={'bearer-token': jwt},
+        data=payload,
+        url_param={'project_id': project_id}
+    )
+    return result

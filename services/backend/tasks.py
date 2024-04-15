@@ -7,6 +7,8 @@ def get_tasks(workspace, user, project):
     params = {'assignee_$eq': user}
     if project:
         params['project_$eq'] = ObjectId(project)
+    else:
+        params['project_$exists'] = False
     result = make_request(
         name='GET_TASKS',
         request_type='GET',

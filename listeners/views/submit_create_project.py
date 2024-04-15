@@ -21,6 +21,8 @@ def submit_create_project(ack, payload, client, context, logger):
             team_id = context['team_id'],
             is_private = True
         )
+        channel_id = create_channel_response['channel']['id']
+        form['channel_id'] = channel_id
         result = create_project(context['team_id'], context['user_id'], form)
         if not result.get('success', False):
             ack(
@@ -30,7 +32,7 @@ def submit_create_project(ack, payload, client, context, logger):
                 }
             )
         ack()
-        channel_id = create_channel_response['channel']['id']
+        
         users = form['developers'] + form['qas'] + [form['project_manager'], form['admin']]
         client.conversations_setTopic(
             channel = channel_id,
