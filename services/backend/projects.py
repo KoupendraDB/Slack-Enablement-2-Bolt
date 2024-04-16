@@ -3,11 +3,16 @@ from .request import make_request
 
 def get_user_projects(workspace, user):
     jwt = fetch_user_jwt(workspace, user)
+    payload = {'$or': [
+        {'project_manager': user},
+        {'developers': {'$elemMatch': {'$eq': user}}},
+        {'qas': {'$elemMatch': {'$eq': user}}}
+    ]}
     result = make_request(
-        name='GET_USER_PROJECTS',
+        name='GET_PROJECTS',
         request_type='GET',
         headers={'bearer-token': jwt},
-        url_param={'user_id': user}
+        data=payload
     )
     return result
 
