@@ -1,39 +1,31 @@
-from .helpers import get_create_task_form_from_payload
-from services.backend.tasks import create_task
+from services.backend.projects import get_project_from_channel
+from ..actions.task_modal import get_create_task_modal
 
-def command_create_task(ack, respond, command, say):
-    form = get_create_task_form_from_payload(command['text'], command['user_id'])
-    ack()
-    if form:
-        result = create_task(command['team_id'], command['user_id'], form)
-        if result.get('success', False):
-            respond(f"New task `{form['title']}` has been created successfully!")
-            if command['user_id'] != form['assignee']:
-                say(
-                    channel=form['assignee'],
-                    text=f"<@{command['user_id']}> has assigned you a task!",
-                    blocks = [
-                        {
-                            "type": "section",
-                            "text": {
-                                "type": "mrkdwn",
-                                "text": f"<@{command['user_id']}> has assigned you a task!"
-                            },
-                            "accessory": {
-                                "type": "button",
-                                "text": {
-                                    "type": "plain_text",
-                                    "text": "View :thinking_face:",
-                                    "emoji": True
-                                },
-                                "value": result['task_id'],
-                                "action_id": f"view_task_from_message-{result['task_id']}"
-                            }
-                        }
-                    ]
+def command_create_task(ack, client, command, logger, body):
+    try:
+        ack()
+        projects_result = get_project_from_channel(command['team_id'], command['user_id'], command['channel_id'])
+        if projects_result.get('success', False):
+            projects = projects_result['projects']
+            if len(projects) > 0:
+                project = projects[0]
+                modal = get_create_task_modal(command, client, project['_id'], project=project)
+                client.views_open(
+                    trigger_id = body['trigger_id'],
+                    view = modal
+                )
+            else:
+                client.chat_postEphemeral(
+                    channel=command['channel_id'],
+                    user=command['user_id'],
+                    text = "Project isn't associated with the Task Manager app!"
                 )
         else:
-            respond(f"Failed to create task `{form['title']}`. Please log in!")
-    else:
-        respond(f"Failed to create task. Please populate `Title` and `Description` fields!")
-    
+            client.chat_postEphemeral(
+                channel=command['channel_id'],
+                user=command['user_id'],
+                text = "Session expired! Please login to the Task Manager app!"
+            )
+            
+    except Exception as e:
+        logger.error(f"Error in command_create_task: {e}")

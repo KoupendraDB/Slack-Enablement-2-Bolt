@@ -6,7 +6,7 @@ import json
 
 def get_assignee_selector_options(project, client):
     users = {}
-    for user in project['qas'] + project['developers'] + [project['project_manager']]:
+    for user in project.get('qas', []) + project.get('developers', []) + [project['project_manager']]:
         user_info = client.users_info(user = user)
         users[user] = user_info['user']['real_name']
 
@@ -38,7 +38,7 @@ def get_assignee_selector_options(project, client):
                     "text": users[dev]
                 },
                 "value": dev
-            } for dev in project['developers']
+            } for dev in project.get('developers', [])
         ]
     })
 
@@ -54,7 +54,7 @@ def get_assignee_selector_options(project, client):
                     "text": users[qa]
                 },
                 "value": qa
-            } for qa in project['qas']
+            } for qa in project.get('qas', [])
         ]
     })
 
@@ -172,7 +172,7 @@ def get_update_task_modal(context, client, user_task, task_id):
     modal['blocks'].append(action_elements)
     return modal
 
-def get_create_task_modal(context, client, project = None, description = {'type': 'rich_text', 'elements': []}):
+def get_create_task_modal(context, client, projectId = None, description = {'type': 'rich_text', 'elements': []}, project = None):
     team = context['team_id']
     user = context['user_id']
     modal = {
@@ -253,14 +253,16 @@ def get_create_task_modal(context, client, project = None, description = {'type'
             }
         ]
     }
+    if projectId and not project:
+        project_result = get_project(team, user, projectId)
+        project = project_result.get('project')
     if project:
-        project_result = get_project(team, user, project)
-        option_groups, users = get_assignee_selector_options(project_result['project'], client)
+        option_groups, users = get_assignee_selector_options(project, client)
         modal['blocks'].insert(0, {
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": f"*Project:* {project_result['project']['name']}"
+                "text": f"*Project:* {project['name']}"
             }
         })
         action_elements['elements'].insert(0, {
@@ -275,7 +277,7 @@ def get_create_task_modal(context, client, project = None, description = {'type'
             },
             "option_groups": option_groups
         })
-        modal['callback_id'] += f'-{project}'
+        modal['callback_id'] += f'-{projectId}'
     modal['blocks'].append(action_elements)
     return modal
 
