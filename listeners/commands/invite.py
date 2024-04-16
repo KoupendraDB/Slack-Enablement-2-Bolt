@@ -3,26 +3,14 @@ from services.backend.users import get_users
 
 def get_options(project, users):
     project_members = project['developers'] + project['qas']
-    qa_group = {
-        "label": {
-            "type": "plain_text",
-            "text": "QAs"
-        },
-        "options": []
-    }
-    dev_group = {
-        "label": {
-            "type": "plain_text",
-            "text": "Developers"
-        },
-        "options": []
-    }
+    qas = []
+    devs = []
     for user in users:
         if user['username'] in project_members:
             continue
         
         if user['role'] == 'qa':
-            qa_group['options'].append({
+            qas.append({
                 "text": {
                     "type": "plain_text",
                     "text": user['name']
@@ -30,7 +18,7 @@ def get_options(project, users):
                 "value": user['username']
             })
         elif user['role'] == 'developer':
-            dev_group['options'].append({
+            devs.append({
                 "text": {
                     "type": "plain_text",
                     "text": user['name']
@@ -38,16 +26,11 @@ def get_options(project, users):
                 "value": user['username']
             })
     
-    option_groups = []
-    if len(dev_group['options']):
-        option_groups.append(dev_group)
-    if len(qa_group['options']):
-        option_groups.append(qa_group)
-    return option_groups
+    return devs, qas
 
 def get_invite_member_modal(project, users):
-    option_groups = get_options(project, users)
-    if len(option_groups) == 0:
+    dev_options, qa_options = get_options(project, users)
+    if len(dev_options) == 0 and len(qa_options) == 0:
         return
     project_id = project['_id']
     modal = {
@@ -59,28 +42,46 @@ def get_invite_member_modal(project, users):
             "type": "plain_text",
             "text": "Create",
         },
-        "callback_id": f"submit_invite_member-{project_id}",
-        "blocks": [
-            {
-                "type": "section",
-                "block_id": "users",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": "Select users to invite"
-                },
-                "accessory": {
-                    "action_id": "users",
-                    "type": "multi_static_select",
-                    "placeholder": {
-                        "type": "plain_text",
-                        "text": "Select users"
-                    },
-                    "option_groups": option_groups
-                }
-            }
-        ],
+        "callback_id": f"submit_invite_members-{project_id}",
+        "blocks": [],
         "type": "modal"
     }
+    if len(dev_options) > 0:
+        modal["blocks"].append({
+            "type": "section",
+            "block_id": "developers",
+            "text": {
+                "type": "mrkdwn",
+                "text": "Select Developers to invite"
+            },
+            "accessory": {
+                "action_id": "developers",
+                "type": "multi_static_select",
+                "placeholder": {
+                    "type": "plain_text",
+                    "text": "Select developers"
+                },
+                "options": dev_options
+            }
+        })
+    if len(qa_options):
+        modal['blocks'].append({
+            "type": "section",
+            "block_id": "qas",
+            "text": {
+                "type": "mrkdwn",
+                "text": "Select QAs to invite"
+            },
+            "accessory": {
+                "action_id": "qas",
+                "type": "multi_static_select",
+                "placeholder": {
+                    "type": "plain_text",
+                    "text": "Select QAs"
+                },
+                "options": qa_options
+            }
+        })
     return modal
 
 def command_invite_member(ack, body, logger, client, command):

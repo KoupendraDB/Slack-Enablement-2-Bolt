@@ -58,3 +58,11 @@ def project_form_from_payload(payload):
         'developers': [option['value'] for option in payload['developers']['developers']['selected_options']],
         'qas': [option['value'] for option in payload['qas']['qas']['selected_options']],
     }
+
+def invite_members_from_payload(payload):
+    members = []
+    if payload.get('developers'):
+        members.extend([option['value'] for option in payload['developers']['developers']['selected_options']])
+    if payload.get('qas'):
+        members.extend([option['value'] for option in payload['qas']['qas']['selected_options']])
+    return members

@@ -246,6 +246,16 @@ def handle_home_view(client, team, user, selected_project = None, selected_statu
             },
             {
                 "type": "button",
+                "style": "primary",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Join a Project :technologist:",
+                    "emoji": True
+                },
+                "action_id": "join_project",
+            },
+            {
+                "type": "button",
                 "text": {
                     "type": "plain_text",
                     "text": "Refresh :arrows_clockwise:",
@@ -258,18 +268,6 @@ def handle_home_view(client, team, user, selected_project = None, selected_statu
 
         if selected_project:
             main_action_buttons[0]['value'] = selected_project
-
-        if user_role in ['admin', 'project_manager']:
-            main_action_buttons.insert(1, {
-                "type": "button",
-                "style": "primary",
-                "text": {
-                    "type": "plain_text",
-                    "text": "Join a Project :technologist:",
-                    "emoji": True
-                },
-                "action_id": "join_project",
-            })
 
         if user_role == 'admin':
             main_action_buttons.insert(1, {
@@ -348,15 +346,6 @@ def handle_home_view(client, team, user, selected_project = None, selected_statu
                                 },
                                 "value": "login",
                                 "action_id": "login_button"
-                            },
-                            {
-                                "type": "button",
-                                "text": {
-                                "type": "plain_text",
-                                "text": "Register now"
-                                },
-                                "value": "register",
-                                "action_id": "register_button"
                             }
                         ]
                     }

@@ -6,7 +6,7 @@ import json
 
 def get_assignee_selector_options(project, client):
     users = {}
-    for user in project.get('qas', []) + project.get('developers', []) + [project['project_manager']]:
+    for user in project['qas'] + project['developers'] + [project['project_manager']]:
         user_info = client.users_info(user = user)
         users[user] = user_info['user']['real_name']
 
