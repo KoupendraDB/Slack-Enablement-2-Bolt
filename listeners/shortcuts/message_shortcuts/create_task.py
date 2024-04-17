@@ -15,7 +15,7 @@ def message_create_task(ack, payload, client, logger, context, shortcut):
                 if block["type"] == "rich_text":
                     description = block
                     break
-            modal = get_create_task_modal(context, client, project_id, description, project)
+            modal = get_create_task_modal(context, project_id, description, project)
             client.views_open(
                 trigger_id = payload['trigger_id'],
                 view = modal

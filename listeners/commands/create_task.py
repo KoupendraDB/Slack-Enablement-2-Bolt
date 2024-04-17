@@ -8,7 +8,7 @@ def command_create_task(ack, client, command, logger, body):
         projects = projects_result['projects']
         if len(projects) > 0:
             project = projects[0]
-            modal = get_create_task_modal(command, client, project['_id'], project=project)
+            modal = get_create_task_modal(command, project['_id'], project=project)
             client.views_open(
                 trigger_id = body['trigger_id'],
                 view = modal
