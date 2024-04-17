@@ -9,6 +9,7 @@ from .task_details_from_message import task_details_from_message
 from .home_project_filter import home_project, home_personal_project
 from .task_modal import update_task_modal, create_task_modal, task_modal_due_date_selector, task_modal_assignee_selector, task_modal_status_selector
 from .create_project import create_project
+from .join_project import join_project
 
 def register(app):
     # Login
@@ -17,6 +18,7 @@ def register(app):
     # Home main buttons
     app.action("create_task")(create_task_modal)
     app.action("create_project")(create_project)
+    app.action("join_project")(join_project)
     app.action("refresh_home")(refresh_home)
     app.action("search_tasks")(search_tasks)
 

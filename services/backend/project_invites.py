@@ -1,14 +1,14 @@
 from bson import ObjectId
 
-def create_project_invite_code(projectId, members):
+def create_project_invite_code(project_id, members):
     from app import mongo_client
     insert_result = mongo_client.SlackApp.invites.insert_one({
-        'projectId': projectId,
+        'project_id': project_id,
         'members': members
     })
     return str(insert_result.inserted_id)
 
-def get_projectId_from_invite_code(code, user):
+def get_project_id_from_invite_code(code, user):
     from app import mongo_client
     try:
         invite_code = ObjectId(code)
@@ -17,7 +17,7 @@ def get_projectId_from_invite_code(code, user):
             'members': {'$elemMatch': {'$eq': user}}
         })
         if result:
-            return result['projectId']
+            return result['project_id']
     except Exception as e:
         print(e)
     return

@@ -3,11 +3,11 @@ from services.backend.project_invites import create_project_invite_code
 
 def submit_invite_members(ack, payload, body, client, context):
     ack()
-    projectId = payload['callback_id'].replace('submit_invite_members', '').replace('-', '')
+    project_id = payload['callback_id'].replace('submit_invite_members', '').replace('-', '')
     members = invite_members_from_payload(body['view']['state']['values'])
     if len(members) == 0:
         return
-    token = create_project_invite_code(projectId, members)
+    token = create_project_invite_code(project_id, members)
     for member in members:
         client.chat_postMessage(
             channel = member,

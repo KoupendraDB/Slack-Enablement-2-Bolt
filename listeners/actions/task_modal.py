@@ -172,7 +172,7 @@ def get_update_task_modal(context, client, user_task, task_id):
     modal['blocks'].append(action_elements)
     return modal
 
-def get_create_task_modal(context, client, projectId = None, description = {'type': 'rich_text', 'elements': []}, project = None):
+def get_create_task_modal(context, client, project_id = None, description = {'type': 'rich_text', 'elements': []}, project = None):
     team = context['team_id']
     user = context['user_id']
     modal = {
@@ -253,8 +253,8 @@ def get_create_task_modal(context, client, projectId = None, description = {'typ
             }
         ]
     }
-    if projectId and not project:
-        project_result = get_project(team, user, projectId)
+    if project_id and not project:
+        project_result = get_project(team, user, project_id)
         project = project_result.get('project')
     if project:
         option_groups, users = get_assignee_selector_options(project, client)
@@ -277,7 +277,7 @@ def get_create_task_modal(context, client, projectId = None, description = {'typ
             },
             "option_groups": option_groups
         })
-        modal['callback_id'] += f'-{projectId}'
+        modal['callback_id'] += f'-{project_id}'
     modal['blocks'].append(action_elements)
     return modal
 

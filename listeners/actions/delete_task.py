@@ -16,10 +16,10 @@ def delete_task_action(ack, body, action, client):
             "blocks": [
                 {
                     "type": "section",
-                        "text": {
-                            "type": "mrkdwn",
-                            "text": f"Are you sure you want to delete this task?",\
-                        }
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": f"Are you sure you want to delete this task?"
+                    }
                 }
             ],
             "type": "modal"

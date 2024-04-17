@@ -91,6 +91,14 @@ def command_invite_member(ack, body, logger, client, command):
             projects = projects_result['projects']
             if len(projects) > 0:
                 project = projects[0]
+                if command['user_id'] not in [project['project_manager'], project['admin']]:
+                    client.chat_postEphemeral(
+                        channel=command['channel_id'],
+                        user=command['user_id'],
+                        text = "You don't have permission to invite!"
+                    )
+                    ack()
+                    return
                 users_result = get_users({'$or': [
                     {'role': 'developer'},
                     {'role': 'qa'}

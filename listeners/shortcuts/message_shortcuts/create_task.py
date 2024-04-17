@@ -6,17 +6,17 @@ def message_create_task(ack, payload, client, logger, context, shortcut):
         ack()
         channel_id = shortcut['channel']['id']
         projects_result = get_project_from_channel(context['team_id'], context['user_id'], channel_id)
-        projectId, project = None, None
+        project_id, project = None, None
         if projects_result.get('success', False):
             projects = projects_result['projects']
             if len(projects) > 0:
-                projectId, project = projects[0]['_id'], projects[0]
+                project_id, project = projects[0]['_id'], projects[0]
                 message_blocks = payload["message"]['blocks']
                 for block in message_blocks:
                     if block["type"] == "rich_text":
                         description = block
                         break
-                modal = get_create_task_modal(context, client, projectId, description, project)
+                modal = get_create_task_modal(context, client, project_id, description, project)
                 client.views_open(
                     trigger_id = payload['trigger_id'],
                     view = modal
