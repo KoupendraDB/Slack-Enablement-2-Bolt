@@ -45,7 +45,9 @@ def tasks_result_modal(tasks):
     return modal
 
 def search_tasks(payload, ack, body, context, client):
+    project_id = payload['callback_id'].replace('search_tasks', '').replace('-', '')
     form = search_form_from_payload(payload['state']['values'])
+    form['project_$eq'] = project_id
     result = search_tasks_service(context['team_id'], context['user_id'], form)
     if result.get('success', False):
         ack()

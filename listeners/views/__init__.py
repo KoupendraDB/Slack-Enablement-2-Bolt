@@ -13,7 +13,7 @@ def register(app):
     app.view(re.compile("submit_new_task-(.+)"))(submit_new_task)
     app.view("submit_create_project")(submit_create_project)
     app.view("login")(login)
-    app.view("search_tasks")(search_tasks)
+    app.view(re.compile("search_tasks-(.+)"))(search_tasks)
     app.view(re.compile("delete_task-(.+)"))(submit_delete_task)
     app.view(re.compile("update_task-(.+)"))(submit_update_task)
     app.view(re.compile("submit_invite_members-(.+)"))(submit_invite_members)

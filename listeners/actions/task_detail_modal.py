@@ -1,5 +1,56 @@
-from datetime import date
+from datetime import date, datetime
 from services.backend.tasks import get_task
+from json import loads
+
+def get_task_details(user_task):
+    last_modified_at = datetime.fromisoformat(user_task['last_modified_at'])
+    created_at = datetime.fromisoformat(user_task['created_at'])
+    details = [
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": f"Last modified by <@{user_task['last_modified_by']}>"
+            }
+        },
+        {
+            "type": "context",
+            "elements": [
+                {
+                    "type": "plain_text",
+                    "text": f"on {last_modified_at.strftime('%m/%d/%Y at %H:%M:%S')}",
+                }
+            ]
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": f"Created by <@{user_task['created_by']}>"
+            }
+        },
+        {
+            "type": "context",
+            "elements": [
+                {
+                    "type": "plain_text",
+                    "text": f"on {created_at.strftime('%m/%d/%Y at %H:%M:%S')}",
+                }
+            ]
+        }
+    ]
+    if user_task.get('description_type', '') == 'mrkdwn':
+        description = {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": user_task['description']
+                        }
+                    }
+    else:
+        description = loads(user_task['description'])
+    task_details = [description] + details
+    return task_details
 
 def create_task_detail_modal(task):
     blocks = [
@@ -38,6 +89,7 @@ def create_task_detail_modal(task):
             "type": "divider"
         }
     ]
+    blocks.extend(get_task_details(task))
     view = {
         "type": "modal",
         "title": {

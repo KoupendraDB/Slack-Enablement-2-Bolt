@@ -34,16 +34,16 @@ def search_form_from_payload(payload):
     form = {}
     if payload['title']['title']['value']:
         form['title_$regex'] = payload['title']['title']['value']
-    if len(payload['assignees']['assignees']['selected_users']):
-        form['assignee_$in'] = ','.join(payload['assignees']['assignees']['selected_users'])
+    if len(payload['assignees']['assignees']['selected_options']):
+        form['assignee_$in'] = ','.join([option['value'] for option in payload['assignees']['assignees']['selected_options']])
     if len(payload['statuses']['statuses']['selected_options']):
         form['status_$in'] = ','.join(list(map(lambda x: x['value'], payload['statuses']['statuses']['selected_options'])))
     if payload['due_date']['min_due_date']['selected_date']:
         form['eta_done_$gte'] = payload['due_date']['min_due_date']['selected_date']
     if payload['due_date']['max_due_date']['selected_date']:
         form['eta_done_$lte'] = payload['due_date']['max_due_date']['selected_date']
-    if len(payload['creators']['creators']['selected_users']):
-        form['created_by_$in'] = ','.join(payload['creators']['creators']['selected_users'])
+    if len(payload['creators']['creators']['selected_options']):
+        form['created_by_$in'] = ','.join([option['value'] for option in payload['creators']['creators']['selected_options']])
     if payload['created_date']['min_created_date']['selected_date']:
         form['created_at_$gte'] = payload['created_date']['min_created_date']['selected_date']
     if payload['created_date']['max_created_date']['selected_date']:

@@ -1,6 +1,9 @@
 from ..events.helpers import get_task_status_options
+from services.backend.projects import get_project
+from .task_modal import get_assignee_selector_options
 
-def search_tasks_modal():
+def search_tasks_modal(project_id, project):
+    option_groups, users = get_assignee_selector_options(project)
     modal = {
         "type": "modal",
         "title": {
@@ -15,10 +18,17 @@ def search_tasks_modal():
             "type": "plain_text",
             "text": "Close"
         },
-        "callback_id": "search_tasks",
+        "callback_id": f"search_tasks-{project_id}",
         "blocks": [
             {
                 "type": "divider"
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"*Project:* {project['name']}",
+                }
             },
             {
                 "type": "input",
@@ -41,12 +51,13 @@ def search_tasks_modal():
                 "type": "input",
                 "block_id": "assignees",
                 "element": {
-                    "type": "multi_users_select",
+                    "type": "multi_static_select",
                     "placeholder": {
                         "type": "plain_text",
                         "text": "Select assignees"
                     },
-                    "action_id": "assignees"
+                    "action_id": "assignees",
+                    "option_groups": option_groups
                 },
                 "optional": True,
                 "label": {
@@ -98,12 +109,13 @@ def search_tasks_modal():
                 "type": "input",
                 "block_id": "creators",
                 "element": {
-                    "type": "multi_users_select",
+                    "type": "multi_static_select",
                     "placeholder": {
                         "type": "plain_text",
                         "text": "Select creators"
                     },
-                    "action_id": "creators"
+                    "action_id": "creators",
+                    "option_groups": option_groups
                 },
                 "optional": True,
                 "label": {
@@ -137,13 +149,17 @@ def search_tasks_modal():
     }
     return modal
 
-def search_tasks(ack, body, client, logger):
+def search_tasks(ack, body, client, context, logger, action):
     try:
         ack()
-        modal = search_tasks_modal()
-        client.views_open(
-            trigger_id = body["trigger_id"],
-            view = modal
-        )
+        project_id = action['value']
+        project_result = get_project(context['team_id'], context['user_id'], project_id)
+        if project_result.get('success', False):
+            project = project_result['project']
+            modal = search_tasks_modal(project_id, project)
+            client.views_open(
+                trigger_id = body["trigger_id"],
+                view = modal
+            )
     except Exception as e:
         logger.error(f"Error in search_tasks_modal: {e}")

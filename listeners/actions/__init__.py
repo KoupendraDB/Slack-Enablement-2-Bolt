@@ -16,15 +16,17 @@ def register(app):
     app.action("login_button")(login_button)
 
     # Home main buttons
-    app.action("create_task")(create_task_modal)
     app.action("create_project")(create_project)
     app.action("join_project")(join_project)
     app.action("refresh_home")(refresh_home)
-    app.action("search_tasks")(search_tasks)
 
     # Project filter buttons
     app.action("home_personal_project")(home_personal_project)
     app.action(re.compile("home_project-(.+)"))(home_project)
+
+    # Project specific buttons
+    app.action("create_task")(create_task_modal)
+    app.action(re.compile("search_tasks-(.+)"))(search_tasks)
 
     # Task Status filter buttons
     app.action(re.compile("home_task_status-(.+)"))(home_task_status)

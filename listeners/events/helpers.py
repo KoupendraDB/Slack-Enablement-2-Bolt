@@ -239,16 +239,6 @@ def handle_home_view(client, team, user, selected_project = None, selected_statu
                 "style": "primary",
                 "text": {
                     "type": "plain_text",
-                    "text": "Create a task :heavy_plus_sign:",
-                    "emoji": True
-                },
-                "action_id": "create_task",
-            },
-            {
-                "type": "button",
-                "style": "primary",
-                "text": {
-                    "type": "plain_text",
                     "text": "Join a Project :technologist:",
                     "emoji": True
                 },
@@ -266,11 +256,23 @@ def handle_home_view(client, team, user, selected_project = None, selected_statu
             }
         ]
 
+        create_task_button = {
+            "type": "button",
+            "style": "primary",
+            "text": {
+                "type": "plain_text",
+                "text": "Create a task :heavy_plus_sign:",
+                "emoji": True
+            },
+            "action_id": "create_task",
+        }
         if selected_project:
-            main_action_buttons[0]['value'] = selected_project
+            create_task_button['value'] = selected_project
+
+        project_specific_buttons = [create_task_button]
 
         if user_role == 'admin':
-            main_action_buttons.insert(1, {
+            main_action_buttons.insert(0, {
                 "type": "button",
                 "style": "primary",
                 "text": {
@@ -281,6 +283,18 @@ def handle_home_view(client, team, user, selected_project = None, selected_statu
                 "action_id": "create_project",
             })
         
+        if (user_role in ['admin', 'project_manager']) and selected_project:
+            project_specific_buttons.append({
+            "type": "button",
+            "text": {
+                "type": "plain_text",
+                "text": "Search tasks :mag:",
+                "emoji": True
+            },
+            "value": selected_project,
+            "action_id": f"search_tasks-{selected_project}",
+        })
+
         blocks = [
             {
                 "type": "actions",
@@ -288,21 +302,26 @@ def handle_home_view(client, team, user, selected_project = None, selected_statu
             },
             {
                 "type": "divider"
-            }
-        ]
-        blocks.extend([
+            },
             projects_buttons,
             {
                 "type": "divider"
-            }
-        ])
-        blocks.append({
+            },
+            {
+                "type": "actions",
+                "elements": project_specific_buttons
+            },
+            {
+                "type": "divider"
+            },
+            {
             "type": "header",
-            "text": {
-                "type": "plain_text",
-                "text": f"{len(tasks_response['tasks'])} task(s) assigned to you"
+                "text": {
+                    "type": "plain_text",
+                    "text": f"{len(tasks_response['tasks'])} task(s) assigned to you"
+                }
             }
-        })
+        ]
         if len(status_buttons['elements']) > 0:
             blocks.extend([
                 status_buttons,
