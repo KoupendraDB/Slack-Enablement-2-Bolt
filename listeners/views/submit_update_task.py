@@ -1,6 +1,7 @@
 from .payload_helper import task_form_from_payload
 from ..events.helpers import handle_home_view
 from services.backend.tasks import update_task
+from services.backend.projects import get_project
 
 def submit_update_task(ack, logger, body, context, client, payload, say):
     try:
@@ -9,17 +10,20 @@ def submit_update_task(ack, logger, body, context, client, payload, say):
         result = update_task(task_id, context['team_id'], context['user_id'], form)
         if result.get('success', False):
             ack()
-            handle_home_view(client, context['team_id'], context['user_id'])
+            project_id = result.get('task', {}).get('project', None)
+            handle_home_view(client, context['team_id'], context['user_id'], project_id)
             if context['user_id'] != form['assignee']:
+                project_result = get_project(context['team_id'], context['user_id'], project_id)
+                project = project_result['project']
                 say(
-                    channel=form['assignee'],
-                    text = f"<@{context['user_id']}> has assigned you a task: {form['title']}! ",
+                    channel=project['channel_id'],
+                    text = f"<@{context['user_id']}> has assigned `{form['title']}` to <@{form['assignee']}>!",
                     blocks = [
                         {
                             "type": "section",
                             "text": {
                                 "type": "mrkdwn",
-                                "text": f"<@{context['user_id']}> has assigned you a task!"
+                                "text": f"<@{context['user_id']}> has assigned `{form['title']}` to <@{form['assignee']}>!"
                             },
                             "accessory": {
                                 "type": "button",
@@ -38,7 +42,7 @@ def submit_update_task(ack, logger, body, context, client, payload, say):
             ack(
                 response_action = 'errors',
                 errors = {
-                    payload['title']: result.get('message', 'Check inputs!')
+                    'title': result.get('message', 'Check inputs!')
                 }
             )
     except Exception as e:

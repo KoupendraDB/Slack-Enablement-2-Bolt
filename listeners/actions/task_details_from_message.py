@@ -15,7 +15,7 @@ def task_details_from_message(ack, action, context, client, body):
         )
     else:
         client.chat_postEphemeral(
-            channel=context['user_id'],
+            channel=context['channel_id'],
             user=context['user_id'],
             text = 'Session expired! Please log in from home'
         )

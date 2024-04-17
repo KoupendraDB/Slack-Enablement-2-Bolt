@@ -251,7 +251,6 @@ def handle_home_view(client, team, user, selected_project = None, selected_statu
                     "text": "Refresh :arrows_clockwise:",
                     "emoji": True
                 },
-                "value": "refresh",
                 "action_id": "refresh_home"
             }
         ]
@@ -268,6 +267,7 @@ def handle_home_view(client, team, user, selected_project = None, selected_statu
         }
         if selected_project:
             create_task_button['value'] = selected_project
+            main_action_buttons[1]['value'] = selected_project
 
         project_specific_buttons = [create_task_button]
 
@@ -292,7 +292,7 @@ def handle_home_view(client, team, user, selected_project = None, selected_statu
                 "emoji": True
             },
             "value": selected_project,
-            "action_id": f"search_tasks-{selected_project}",
+            "action_id": "search_tasks",
         })
 
         blocks = [

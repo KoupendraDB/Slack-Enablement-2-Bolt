@@ -26,7 +26,7 @@ def register(app):
 
     # Project specific buttons
     app.action("create_task")(create_task_modal)
-    app.action(re.compile("search_tasks-(.+)"))(search_tasks)
+    app.action("search_tasks")(search_tasks)
 
     # Task Status filter buttons
     app.action(re.compile("home_task_status-(.+)"))(home_task_status)
