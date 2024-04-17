@@ -17,7 +17,7 @@ def member_joined_channel(event, client, logger):
                     client.chat_postEphemeral(
                         channel = event['channel'],
                         user = event['inviter'],
-                        text = f"{event['user']} is not part of the project and hence removed from channel!"
+                        text = f"<@{event['user']}> is not part of the project and hence removed from channel!"
                     )
     except Exception as e:
         logger.error(f"Error in member_joined_channel: {e}")
