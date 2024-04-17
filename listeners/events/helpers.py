@@ -227,7 +227,7 @@ def generate_projects_buttons(projects, selected_project):
 
 def handle_home_view(client, team, user, selected_project = None, selected_status = None):
     tasks_response = get_tasks(team, user, selected_project)
-    project_response = get_user_projects(team, user)
+    project_response = get_user_projects(user)
     if tasks_response.get('success', False):
         status_buttons = generate_status_buttons(tasks_response['tasks'], selected_project, selected_status)
         projects_buttons = generate_projects_buttons(project_response['projects'], selected_project)

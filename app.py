@@ -5,6 +5,8 @@ app = App(token=os.environ.get("SLACK_BOT_TOKEN"))
 from services.mongo.client import MongoManager
 mongo_client = MongoManager().mongo_client
 
+bot_info = app.client.auth_test()
+
 from listeners import register_listeners
 register_listeners(app)
 

@@ -32,11 +32,11 @@ def update_project(workspace, user, project_id, payload):
     )
     return result
 
-def get_user_projects(workspace, user):
-    jwt = fetch_user_jwt(workspace, user)
+def get_user_projects(user):
     payload = {
         'query': {'$or': [
             {'project_manager': user},
+            {'admin': user},
             {'developers': {'$elemMatch': {'$eq': user}}},
             {'qas': {'$elemMatch': {'$eq': user}}}
         ]}
@@ -44,20 +44,17 @@ def get_user_projects(workspace, user):
     result = make_request(
         name='GET_PROJECTS',
         request_type='GET',
-        headers={'bearer-token': jwt},
         data=payload
     )
     return result
 
-def get_project_from_channel(workspace, user, channel_id):
-    jwt = fetch_user_jwt(workspace, user)
+def get_project_from_channel(channel_id):
     payload = {
         'query': {'channel_id': channel_id}
     }
     result = make_request(
         name='GET_PROJECTS',
         request_type='GET',
-        headers={'bearer-token': jwt},
         data=payload
     )
     return result
