@@ -53,7 +53,7 @@ def get_create_project_modal():
                 "block_id": "developers",
                 "element": {
                     "type": "multi_external_select",
-                    "min_query_length": 0,
+                    "min_query_length": 2,
                     "placeholder": {
                         "type": "plain_text",
                         "text": "Select developers"
@@ -70,7 +70,7 @@ def get_create_project_modal():
                 "block_id": "qas",
                 "element": {
                     "type": "multi_external_select",
-                    "min_query_length": 0,
+                    "min_query_length": 2,
                     "placeholder": {
                         "type": "plain_text",
                         "text": "Select QAs"

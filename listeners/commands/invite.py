@@ -1,88 +1,54 @@
 from services.backend.projects import get_project_from_channel
-from services.backend.users import get_users
 
-def get_options(project, users):
-    project_members = project['developers'] + project['qas']
-    qas = []
-    devs = []
-    for user in users:
-        if user['username'] in project_members:
-            continue
-        
-        if user['role'] == 'qa':
-            qas.append({
-                "text": {
-                    "type": "plain_text",
-                    "text": user['name']
-                },
-                "value": user['username']
-            })
-        elif user['role'] == 'developer':
-            devs.append({
-                "text": {
-                    "type": "plain_text",
-                    "text": user['name']
-                },
-                "value": user['username']
-            })
-    
-    return devs, qas
-
-def get_invite_member_modal(project, users):
-    dev_options, qa_options = get_options(project, users)
-    if len(dev_options) == 0 and len(qa_options) == 0:
-        return
-    project_id = project['_id']
-    modal = {
+def get_invite_member_modal(project_id):
+    return {
         "title": {
             "type": "plain_text",
-            "text": "Invite a member"
+            "text": "Invite members"
         },
         "submit": {
             "type": "plain_text",
             "text": "Create",
         },
         "callback_id": f"submit_invite_members-{project_id}",
-        "blocks": [],
+        "blocks": [
+            {
+                "type": "section",
+                "block_id": "developers",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "Select Developers to invite"
+                },
+                "accessory": {
+                    "action_id": "developers",
+                    "type": "multi_external_select",
+                    "min_query_length": 2,
+                    "placeholder": {
+                        "type": "plain_text",
+                        "text": "Select Developers"
+                    }
+                }
+            },
+            {
+                "type": "section",
+                "block_id": "qas",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "Select QAs to invite"
+                },
+                "accessory": {
+                    "action_id": "qas",
+                    "type": "multi_external_select",
+                    "min_query_length": 2,
+                    "placeholder": {
+                        "type": "plain_text",
+                        "text": "Select QAs"
+                    },
+                }
+            }
+        ],
         "type": "modal"
     }
-    if len(dev_options) > 0:
-        modal["blocks"].append({
-            "type": "section",
-            "block_id": "developers",
-            "text": {
-                "type": "mrkdwn",
-                "text": "Select Developers to invite"
-            },
-            "accessory": {
-                "action_id": "developers",
-                "type": "multi_static_select",
-                "placeholder": {
-                    "type": "plain_text",
-                    "text": "Select developers"
-                },
-                "options": dev_options
-            }
-        })
-    if len(qa_options):
-        modal['blocks'].append({
-            "type": "section",
-            "block_id": "qas",
-            "text": {
-                "type": "mrkdwn",
-                "text": "Select QAs to invite"
-            },
-            "accessory": {
-                "action_id": "qas",
-                "type": "multi_static_select",
-                "placeholder": {
-                    "type": "plain_text",
-                    "text": "Select QAs"
-                },
-                "options": qa_options
-            }
-        })
-    return modal
 
 def command_invite_member(ack, body, logger, client, command):
     try:
@@ -98,23 +64,11 @@ def command_invite_member(ack, body, logger, client, command):
                 )
                 ack()
                 return
-            users_result = get_users({'$or': [
-                {'role': 'developer'},
-                {'role': 'qa'}
-            ]})
-            users = users_result.get('users', [])
-            modal = get_invite_member_modal(project, users)
-            if modal:
-                client.views_open(
-                    trigger_id = body['trigger_id'],
-                    view = modal
-                )
-            else:
-                client.chat_postEphemeral(
-                    channel=command['channel_id'],
-                    user=command['user_id'],
-                    text = "No users available!"
-                )
+            modal = get_invite_member_modal(project['_id'])
+            client.views_open(
+                trigger_id = body['trigger_id'],
+                view = modal
+            )
         else:
             client.chat_postEphemeral(
                 channel=command['channel_id'],

@@ -44,6 +44,9 @@ def register(app):
     app.action(re.compile("developers"))(task_modal_assignee_selector)
     app.action(re.compile("qas"))(task_modal_assignee_selector)
 
+    # Roll Off members modal
+    app.action("members")(task_modal_assignee_selector)
+
     # Search Task
     app.action("min_due_date")(task_modal_due_date_selector)
     app.action("max_due_date")(task_modal_due_date_selector)
