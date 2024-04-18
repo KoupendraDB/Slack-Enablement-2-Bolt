@@ -18,7 +18,22 @@ def submit_invite_members(ack, payload, body, client, context):
                     "text": {
                         "type": "mrkdwn",
                         "text": f"<@{context['user_id']}> has invited you to join a project!\n\nClick on *Join a Project* button and enter the following code: `{token}`"
-                    }
+                    },
+                },
+                {
+                    "type": "actions",
+                    "elements": [
+                        {
+                            "type": "button",
+                            "style": "primary",
+                            "text": {
+                                "type": "plain_text",
+                                "text": "Join a Project :technologist:",
+                                "emoji": True
+                            },
+                            "action_id": "join_project",
+                        }
+                    ]
                 }
             ]
         )
