@@ -1,7 +1,10 @@
 from services.backend.tasks import get_tasks
-from datetime import date
+from services.backend.projects import get_user_projects
+from services.backend.roles import fetch_user_role
+from datetime import date, datetime
+from json import loads
 
-tasks_statuses = ['Ready', 'In-Progress', 'Code Review', 'Deployed', 'QA', 'Rejected', 'Blocked', 'Accepted', 'Cancelled']
+tasks_statuses = ['To-Do', 'In-Progress', 'In-QA', 'Done']
 
 def get_task_status_options():
     blocks = []
@@ -16,42 +19,16 @@ def get_task_status_options():
     return blocks
 
 def get_action_elements(user, user_task):
-    elements = [
-        {
-            "type": "users_select",
-            "placeholder": {
-                "type": "plain_text",
-                "text": "Assignee",
-            },
-            "initial_user": user,
-            "action_id": f"assignee_selector-{user_task['_id']}"
+    elements = [{
+        "type": "button",
+        "text": {
+            "type": "plain_text",
+            "text": "Update :pencil2:",
+            "emoji": True
         },
-        {
-            "type": "static_select",
-            "placeholder": {
-                "type": "plain_text",
-                "text": "Status",
-            },
-            "options": get_task_status_options(),
-            "initial_option": {
-                "text": {
-                    "type": "plain_text",
-                    "text": user_task['status'],
-                },
-                "value": user_task['status']
-            },
-            "action_id": f"task_status_selector-{user_task['_id']}"
-        },
-        {
-            "type": "datepicker",
-            "initial_date": f"{user_task['eta_done'].split('T')[0]}",
-            "placeholder": {
-                "type": "plain_text",
-                "text": "To be done by",
-            },
-            "action_id": f"task_eta_selector-{user_task['_id']}"
-        }
-    ]
+        "value": user_task['_id'],
+        "action_id": f"update_task_modal-{user_task['_id']}"
+    }]
     if user == user_task['created_by']:
         elements.append({
             "type": "button",
@@ -61,12 +38,72 @@ def get_action_elements(user, user_task):
                 "text": "Delete :walking:",
                 "emoji": True
             },
-            "value": "delete",
-            "action_id": f"delete_task-{user_task['_id']}"
+            "value": user_task['_id'],
+            "action_id": f"delete_task_modal-{user_task['_id']}"
         })
     return elements
 
+def get_task_details(user_task):
+    last_modified_at = datetime.fromisoformat(user_task['last_modified_at'])
+    created_at = datetime.fromisoformat(user_task['created_at'])
+    due_date = datetime.fromisoformat(user_task['eta_done'])
+    details = [{
+        "type": "section",
+        "text": {
+            "type": "mrkdwn",
+            "text": f"_Due on {due_date.strftime('%m/%d/%Y')}_",\
+        }
+	}]
+    if user_task.get('project', False):
+        details.extend([
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"Last modified by <@{user_task['last_modified_by']}>"
+                }
+            },
+            {
+                "type": "context",
+                "elements": [
+                    {
+                        "type": "plain_text",
+                        "text": f"on {last_modified_at.strftime('%m/%d/%Y at %H:%M:%S')}",
+                    }
+                ]
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"Created by <@{user_task['created_by']}>"
+                }
+            },
+            {
+                "type": "context",
+                "elements": [
+                    {
+                        "type": "plain_text",
+                        "text": f"on {created_at.strftime('%m/%d/%Y at %H:%M:%S')}",
+                    }
+                ]
+            }
+        ])
+    if user_task.get('description_type', '') == 'mrkdwn':
+        description = {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": user_task['description']
+                        }
+                    }
+    else:
+        description = loads(user_task['description'])
+    task_details = [description] + details
+    return task_details
+
 def generate_task_block(user_task, user):
+    task_details = get_task_details(user_task)
     task = [
         {
             "type": "section",
@@ -76,19 +113,7 @@ def generate_task_block(user_task, user):
                 "text": f"*{user_task['title']}*"
             }
         },
-        {
-			"type": "actions",
-			"elements": [{
-                "type": "button",
-                "text": {
-                    "type": "plain_text",
-                    "text": "View details",
-                    "emoji": True
-                },
-                "value": "details",
-                "action_id": f"task_details-{user_task['_id']}"
-            }]
-		},
+        *task_details,
         {
             "type": "actions",
             "elements": get_action_elements(user, user_task)
@@ -138,7 +163,7 @@ def generate_tasks_blocks(user_tasks, user, selected_status):
                 blocks.extend(task)
     return blocks
 
-def generate_status_buttons(tasks, selected_status):
+def generate_status_buttons(tasks, selected_project, selected_status):
     status_count = {}
     for task in tasks:
         status_count[task['status']] = status_count.get(task['status'], 0) + 1
@@ -153,7 +178,7 @@ def generate_status_buttons(tasks, selected_status):
                     "type": "plain_text",
                     "text": f"{status} ({status_count.get(status, 0)})"
                 },
-                "value": f"{status}",
+                "value": f"{selected_project if selected_project else ''}:{status}",
                 "action_id": f"home_task_status-{status}",
             }
             if status == selected_status:
@@ -167,54 +192,134 @@ def generate_status_buttons(tasks, selected_status):
 
     return actions
 
-def handle_home_view(client, team, user, selected_status = None):
-    tasks_response = get_tasks(team, user)
+def generate_projects_buttons(projects, selected_project):
+    elements = [{
+        "type": "button",
+        "text": {
+            "type": "plain_text",
+            "text": f"Personal Tasks"
+        },
+        "action_id": "home_personal_project",
+    }]
+
+    for project in projects:
+        button = {
+            "type": "button",
+            "text": {
+                "type": "plain_text",
+                "text": f"{project['name']}"
+            },
+            "value": f"{project['_id']}",
+            "action_id": f"home_project-{project['_id']}",
+        }
+        if project['_id'] == selected_project:
+            button['style'] = 'primary'
+        elements.append(button)
+
+    if not selected_project:
+        elements[0]['style'] = 'primary'
+
+    actions = {
+        "type": "actions",
+        "elements": elements
+    }
+    return actions
+
+def handle_home_view(client, team, user, selected_project = None, selected_status = None):
+    tasks_response = get_tasks(team, user, selected_project)
+    project_response = get_user_projects(user)
     if tasks_response.get('success', False):
-        status_buttons = generate_status_buttons(tasks_response['tasks'], selected_status)
+        status_buttons = generate_status_buttons(tasks_response['tasks'], selected_project, selected_status)
+        projects_buttons = generate_projects_buttons(project_response['projects'], selected_project)
         task_blocks = generate_tasks_blocks(tasks_response['tasks'], user, selected_status)
+        user_role = fetch_user_role(team, user)
+        main_action_buttons = [
+            {
+                "type": "button",
+                "style": "primary",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Join a Project :technologist:",
+                    "emoji": True
+                },
+                "action_id": "join_project",
+            },
+            {
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Refresh :arrows_clockwise:",
+                    "emoji": True
+                },
+                "action_id": "refresh_home"
+            }
+        ]
+
+        create_task_button = {
+            "type": "button",
+            "style": "primary",
+            "text": {
+                "type": "plain_text",
+                "text": "Create a task :heavy_plus_sign:",
+                "emoji": True
+            },
+            "action_id": "create_task",
+        }
+        if selected_project:
+            create_task_button['value'] = selected_project
+            main_action_buttons[1]['value'] = selected_project
+
+        project_specific_buttons = [create_task_button]
+
+        if user_role == 'admin':
+            main_action_buttons.insert(0, {
+                "type": "button",
+                "style": "primary",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Create a Project :notebook:",
+                    "emoji": True
+                },
+                "action_id": "create_project",
+            })
+        
+        if (user_role in ['admin', 'project_manager']) and selected_project:
+            project_specific_buttons.append({
+            "type": "button",
+            "text": {
+                "type": "plain_text",
+                "text": "Search tasks :mag:",
+                "emoji": True
+            },
+            "value": selected_project,
+            "action_id": "search_tasks",
+        })
+
         blocks = [
             {
-                "type": "header",
+                "type": "actions",
+                "elements": main_action_buttons
+            },
+            {
+                "type": "divider"
+            },
+            projects_buttons,
+            {
+                "type": "divider"
+            },
+            {
+                "type": "actions",
+                "elements": project_specific_buttons
+            },
+            {
+                "type": "divider"
+            },
+            {
+            "type": "header",
                 "text": {
                     "type": "plain_text",
                     "text": f"{len(tasks_response['tasks'])} task(s) assigned to you"
                 }
-            },
-            {
-                "type": "actions",
-                "elements": [
-                    {
-                        "type": "button",
-                        "style": "primary",
-                        "text": {
-                            "type": "plain_text",
-                            "text": "Create a task :heavy_plus_sign:",
-                            "emoji": True
-                        },
-                        "action_id": "create_task",
-                    },
-                    {
-                        "type": "button",
-                        "style": "primary",
-                        "text": {
-                            "type": "plain_text",
-                            "text": "Search tasks :mag:",
-                            "emoji": True
-                        },
-                        "action_id": "search_tasks",
-                    },
-                    {
-                        "type": "button",
-                        "style": "primary",
-                        "text": {
-                            "type": "plain_text",
-                            "text": "Refresh :arrows_clockwise:",
-                            "emoji": True
-                        },
-                        "value": "refresh",
-                        "action_id": "refresh_home"
-                    }
-                ]
             }
         ]
         if len(status_buttons['elements']) > 0:
@@ -260,15 +365,6 @@ def handle_home_view(client, team, user, selected_status = None):
                                 },
                                 "value": "login",
                                 "action_id": "login_button"
-                            },
-                            {
-                                "type": "button",
-                                "text": {
-                                "type": "plain_text",
-                                "text": "Register now"
-                                },
-                                "value": "register",
-                                "action_id": "register_button"
                             }
                         ]
                     }

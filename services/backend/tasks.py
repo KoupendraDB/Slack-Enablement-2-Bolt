@@ -1,13 +1,19 @@
-from .helper import fetch_user_jwt
+from .jwt import fetch_user_jwt
 from .request import make_request
+from bson import ObjectId
 
-def get_tasks(workspace, user):
+def get_tasks(workspace, user, project):
     jwt = fetch_user_jwt(workspace, user)
+    params = {'assignee_$eq': user}
+    if project:
+        params['project_$eq'] = ObjectId(project)
+    else:
+        params['project_$exists'] = False
     result = make_request(
         name='GET_TASKS',
         request_type='GET',
         headers={'bearer-token': jwt},
-        params={'assignee_$eq': user}
+        params=params
     )
     return result
 
