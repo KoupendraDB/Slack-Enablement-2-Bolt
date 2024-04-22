@@ -1,5 +1,4 @@
-from services.backend.tasks import get_tasks
-from services.backend.projects import get_user_projects
+from services.backend.external import get_user_project_tasks, get_user_personal_tasks, get_user_projects
 from services.backend.roles import fetch_user_role
 from datetime import date, datetime
 from json import loads
@@ -226,7 +225,7 @@ def generate_projects_buttons(projects, selected_project):
     return actions
 
 def handle_home_view(client, team, user, selected_project = None, selected_status = None):
-    tasks_response = get_tasks(team, user, selected_project)
+    tasks_response = get_user_project_tasks(team, user, selected_project) if selected_project else get_user_personal_tasks(team, user)
     project_response = get_user_projects(user)
     if tasks_response.get('success', False):
         status_buttons = generate_status_buttons(tasks_response['tasks'], selected_project, selected_status)

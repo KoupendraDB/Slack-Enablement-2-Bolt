@@ -4,5 +4,6 @@
         "username_variable": "mongo_username",
         "password_variable": "mongo_password"
     },
-    "backend_server_uri": "http://3.139.127.119:5000"
+    "backend_server_uri": "http://3.139.127.119:5000",
+    "max_user_projects": 1
 }

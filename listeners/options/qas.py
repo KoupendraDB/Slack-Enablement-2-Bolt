@@ -1,14 +1,7 @@
-from services.backend.users import get_users
+from services.backend.external import get_available_users_by_role
 
 def qas(ack, payload):
-    result = get_users({
-        'role': 'qa',
-        'name': {'$regex': payload['value']},
-        'projects': {
-            '$exists': True,
-            '$size': 0
-        }
-    })
+    result = get_available_users_by_role('qa', payload['value'])
     users = result.get('users', [])
     ack(options=[
         {

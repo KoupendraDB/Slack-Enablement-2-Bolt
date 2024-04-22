@@ -1,14 +1,7 @@
-from services.backend.users import get_users
+from services.backend.external import get_available_users_by_role
 
 def project_managers(ack, payload):
-    result = get_users({
-        'role': 'project_manager',
-        'name': {'$regex': payload['value']},
-        'projects': {
-            '$exists': True,
-            '$size': 0
-        }
-    })
+    result = get_available_users_by_role('project_manager', payload['value'])
     users = result.get('users', [])
     ack(options=[
         {

@@ -1,15 +1,14 @@
-from services.backend.projects import get_project_from_channel
+from services.backend.external import get_project_by_channel, get_project_members
 
 def member_joined_channel(event, client, logger):
     from app import bot_info
     try:
         if event['inviter'] != bot_info['user_id']:
-            project_search_result = get_project_from_channel(event['channel'])
-            projects = project_search_result['projects']
-            if len(projects) > 0:
-                project = projects[0]
-                members = project['qas'] + project['developers'] + [project['admin'], project['project_manager']]
-                if event['user'] not in members:
+            result = get_project_by_channel(event['channel'])
+            project = result.get('project')
+            if project:
+                members = get_project_members(project['_id']).get('members')
+                if event['user'] not in [user['username'] for user in members]:
                     client.conversations_kick(
                         channel = event['channel'],
                         user = event['user']

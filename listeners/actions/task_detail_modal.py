@@ -1,5 +1,5 @@
 from datetime import date, datetime
-from services.backend.tasks import get_task
+from services.backend.external import get_task
 from json import loads
 
 def get_task_details(user_task):
@@ -109,7 +109,7 @@ def task_detail_modal(ack, body, client, context, action):
     user = context['user_id']
     task_id = action['value']
     trigger_id = body['trigger_id']
-    result = get_task(task_id, team, user)
+    result = get_task(team, user, task_id)
     if result.get('success', False):
         ack()
         client.views_push(

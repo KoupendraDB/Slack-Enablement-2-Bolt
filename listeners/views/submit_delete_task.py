@@ -1,5 +1,5 @@
 from ..events.helpers import handle_home_view
-from services.backend.tasks import delete_task
+from services.backend.external import delete_task
 
 def submit_delete_task(ack, context, payload, client):
     task_id = payload['callback_id'].replace('delete_task-', '')

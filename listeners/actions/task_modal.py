@@ -1,87 +1,55 @@
-from services.backend.tasks import get_task
-from services.backend.projects import get_project
-from services.backend.users import get_users
+from services.backend.external import get_task, get_project, get_project_members
 from ..events.helpers import get_task_status_options
 from datetime import date
 import json
 
-def get_assignee_selector_options(project):
+def get_assignee_selector_options(project_id, initial_user = None):
     users = {}
-    project_members = project['qas'] + project['developers'] + [project['project_manager'], project['admin']]
-    get_users_result = get_users({'username': {'$in': project_members}})
-    project_users = get_users_result['users']
+    get_users_result = get_project_members(project_id)
+    project_users = get_users_result['members']
+
+    option_groups = [
+        {
+            "label": {
+                "type": "plain_text",
+                "text": f"{role_name}"
+            },
+            "options": []
+        } for role_name in ['Project Manager', 'Developers', 'QAs', 'Admin']
+    ]
+
     for user in project_users:
         users[user['username']] = user['name']
+        option = {
+            "text": {
+                "type": "plain_text",
+                "text": user['name']
+            },
+            "value": user['username']
+        }
+        if user['role'] == 'project_manager':
+            option_groups[0].append(option)
+        elif user['role'] == 'developer':
+            option_groups[1].append(option)
+        elif user['role'] == 'qa':
+            option_groups[2].append(option)
+        elif user['role'] == 'admin':
+            option_groups[3].append(option)
 
-    option_groups = [{
-        "label": {
-            "type": "plain_text",
-            "text": "Project Manager"
-        },
-        "options": [
-            {
-                "text": {
-                    "type": "plain_text",
-                    "text": users[project['project_manager']]
-                },
-                "value": project['project_manager']
-            }
-        ]
-    }]
-
-    option_groups.append({
-        "label": {
-            "type": "plain_text",
-            "text": "Developers"
-        },
-        "options": [
-            {
-                "text": {
-                    "type": "plain_text",
-                    "text": users[dev]
-                },
-                "value": dev
-            } for dev in project.get('developers', [])
-        ]
-    })
-
-    option_groups.append({
-        "label": {
-            "type": "plain_text",
-            "text": "QAs"
-        },
-        "options": [
-            {
-                "text": {
-                    "type": "plain_text",
-                    "text": users[qa]
-                },
-                "value": qa
-            } for qa in project.get('qas', [])
-        ]
-    })
-
-    option_groups.append({
-        "label": {
-            "type": "plain_text",
-            "text": "Admin"
-        },
-        "options": [
-            {
-                "text": {
-                    "type": "plain_text",
-                    "text": users[project['admin']]
-                },
-                "value": project['admin']
-            }
-        ]
-    })
-
-    return option_groups, users
+    filtered_groups = list(filter(lambda x: len(x['options'] > 0), option_groups))
+    
+    if initial_user:
+        return filtered_groups, {
+            "text": {
+                "type": "plain_text",
+                "text": users[initial_user]
+            },
+            "value": initial_user
+        }
+    return filtered_groups, None
 
 
 def get_update_task_modal(context, user_task, task_id):
-    team = context['team_id']
     user = context['user_id']
     if user_task.get('description_type', '') == 'mrkdwn':
         description = {
@@ -174,18 +142,11 @@ def get_update_task_modal(context, user_task, task_id):
     }
     project_id = user_task.get('project', None)
     if project_id:
-        project = get_project(team, user, project_id)
-        option_groups, users = get_assignee_selector_options(project['project'])
+        option_groups, initial_option = get_assignee_selector_options(project_id, user)
         action_elements['elements'].insert(0, {
             "type": "static_select",
             "action_id": f"task_modal_assignee_selector",
-            "initial_option": {
-                "text": {
-                    "type": "plain_text",
-                    "text": users[user]
-                },
-                "value": user
-            },
+            "initial_option": initial_option,
             "option_groups": option_groups
         })
     modal['blocks'].append(action_elements)
@@ -276,7 +237,7 @@ def get_create_task_modal(context, project_id = None, description = {'type': 'ri
         project_result = get_project(team, user, project_id)
         project = project_result.get('project')
     if project:
-        option_groups, users = get_assignee_selector_options(project)
+        option_groups, initial_option = get_assignee_selector_options(project_id, user)
         modal['blocks'].insert(0, {
             "type": "section",
             "text": {
@@ -287,13 +248,7 @@ def get_create_task_modal(context, project_id = None, description = {'type': 'ri
         action_elements['elements'].insert(0, {
             "type": "static_select",
             "action_id": f"task_modal_assignee_selector",
-            "initial_option": {
-                "text": {
-                    "type": "plain_text",
-                    "text": users[user]
-                },
-                "value": user
-            },
+            "initial_option": initial_option,
             "option_groups": option_groups
         })
         modal['callback_id'] += f'-{project_id}'
@@ -305,7 +260,7 @@ def update_task_modal(ack, context, action, client, body):
     team = context['team_id']
     user = context['user_id']
     task_id = action['value']
-    result = get_task(task_id, team, user)
+    result = get_task(team, user, task_id)
     if result.get('success', False):
         modal = get_update_task_modal(context, result['task'], task_id)
         client.views_open(

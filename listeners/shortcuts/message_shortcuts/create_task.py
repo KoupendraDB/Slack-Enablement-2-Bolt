@@ -1,21 +1,19 @@
-from services.backend.projects import get_project_from_channel
+from services.backend.external import get_project_by_channel
 from ...actions.task_modal import get_create_task_modal
 
 def message_create_task(ack, payload, client, logger, context, shortcut):
     try:
         ack()
         channel_id = shortcut['channel']['id']
-        projects_result = get_project_from_channel(channel_id)
-        project_id, project = None, None
-        projects = projects_result['projects']
-        if len(projects) > 0:
-            project_id, project = projects[0]['_id'], projects[0]
+        result = get_project_by_channel(channel_id)
+        project = result.get('project')
+        if project:
             message_blocks = payload["message"]['blocks']
             for block in message_blocks:
                 if block["type"] == "rich_text":
                     description = block
                     break
-            modal = get_create_task_modal(context, project_id, description, project)
+            modal = get_create_task_modal(context, project['_id'], description, project)
             client.views_open(
                 trigger_id = payload['trigger_id'],
                 view = modal

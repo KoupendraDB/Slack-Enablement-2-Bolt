@@ -1,6 +1,6 @@
 
 from .payload_helper import project_form_from_payload
-from services.backend.projects import create_project
+from services.backend.external import create_project
 
 def get_welcome_message(form):
     new_line = '\n'

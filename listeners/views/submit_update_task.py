@@ -1,7 +1,6 @@
 from .payload_helper import task_form_from_payload
 from ..events.helpers import handle_home_view
-from services.backend.tasks import update_task
-from services.backend.projects import get_project
+from services.backend.external import update_task, get_project
 
 def submit_update_task(ack, logger, body, context, client, payload, say):
     try:

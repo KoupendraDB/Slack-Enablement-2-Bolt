@@ -1,13 +1,12 @@
-from services.backend.projects import get_project_from_channel
+from services.backend.external import get_project_by_channel
 from ..actions.task_modal import get_create_task_modal
 
 def command_create_task(ack, client, command, logger, body):
     try:
         ack()
-        projects_result = get_project_from_channel(command['channel_id'])
-        projects = projects_result['projects']
-        if len(projects) > 0:
-            project = projects[0]
+        result = get_project_by_channel(command['channel_id'])
+        project = result.get('project')
+        if project:
             modal = get_create_task_modal(command, project['_id'], project=project)
             client.views_open(
                 trigger_id = body['trigger_id'],

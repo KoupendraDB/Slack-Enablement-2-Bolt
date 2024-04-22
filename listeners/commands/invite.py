@@ -1,4 +1,4 @@
-from services.backend.projects import get_project_from_channel
+from services.backend.external import get_project_by_channel
 
 def get_invite_member_modal(project_id):
     return {
@@ -52,10 +52,9 @@ def get_invite_member_modal(project_id):
 
 def command_invite_member(ack, body, logger, client, command):
     try:
-        projects_result = get_project_from_channel(command['channel_id'])
-        projects = projects_result['projects']
-        if len(projects) > 0:
-            project = projects[0]
+        result = get_project_by_channel(command['channel_id'])
+        project = result.get('project')
+        if project:
             if command['user_id'] not in [project['project_manager'], project['admin']]:
                 client.chat_postEphemeral(
                     channel=command['channel_id'],

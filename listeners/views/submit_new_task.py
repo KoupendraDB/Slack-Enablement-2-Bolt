@@ -1,6 +1,5 @@
 from .payload_helper import task_form_from_payload
-from services.backend.tasks import create_task
-from services.backend.projects import get_project
+from services.backend.external import create_task, get_project
 
 def submit_new_task(ack, logger, body, context, client, payload):
     try:

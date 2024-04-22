@@ -1,5 +1,5 @@
 from .payload_helper import search_form_from_payload
-from services.backend.tasks import search_tasks as search_tasks_service
+from services.backend.external import search_tasks as search_tasks_service
 
 def tasks_result_modal(tasks):
     blocks = []

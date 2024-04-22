@@ -1,49 +1,35 @@
-from services.backend.projects import get_project_from_channel
-from services.backend.users import get_users
+from services.backend.external import get_project_by_channel, get_project_members
+from services.backend.roles import fetch_user_role
 
-def get_option_groups(project):
-    members = project['qas'] + project['developers']
-    users_result = get_users({'username': {'$in': members}})
-    users = users_result.get('users', [])
-    names_of_users = {}
-    for user in users:
-        names_of_users[user['username']] = user['name']
+def get_option_groups(project_id):
+    get_users_result = get_project_members(project_id)
+    project_users = get_users_result['members']
 
-    option_groups = []
+    option_groups = [
+        {
+            "label": {
+                "type": "plain_text",
+                "text": f"{role_name}"
+            },
+            "options": []
+        } for role_name in ['Developers', 'QAs']
+    ]
 
-    option_groups.append({
-        "label": {
-            "type": "plain_text",
-            "text": "Developers"
-        },
-        "options": [
-            {
-                "text": {
-                    "type": "plain_text",
-                    "text": names_of_users[dev]
-                },
-                "value": dev
-            } for dev in project.get('developers', [])
-        ]
-    })
+    for user in project_users:
+        option = {
+            "text": {
+                "type": "plain_text",
+                "text": user['name']
+            },
+            "value": user['username']
+        }
+        if user['role'] == 'developer':
+            option_groups[0].append(option)
+        elif user['role'] == 'qa':
+            option_groups[1].append(option)
 
-    option_groups.append({
-        "label": {
-            "type": "plain_text",
-            "text": "QAs"
-        },
-        "options": [
-            {
-                "text": {
-                    "type": "plain_text",
-                    "text": names_of_users[qa]
-                },
-                "value": qa
-            } for qa in project.get('qas', [])
-        ]
-    })
-
-    return [group for group in option_groups if len(group['options']) > 0]
+    filtered_groups = list(filter(lambda x: len(x['options'] > 0), option_groups))
+    return filtered_groups
 
 def get_roll_off_modal(project):
     option_groups = get_option_groups(project)
@@ -85,11 +71,11 @@ def get_roll_off_modal(project):
 
 def command_roll_off(ack, logger, command, client, body):
     try:
-        projects_result = get_project_from_channel(command['channel_id'])
-        projects = projects_result['projects']
-        if len(projects) > 0:
-            project = projects[0]
-            if command['user_id'] not in [project['project_manager'], project['admin']]:
+        result = get_project_by_channel(command['channel_id'])
+        project = result.get('project')
+        if project:
+            role = fetch_user_role(command['team_id'], command['user_id'])
+            if role not in ['project_manager', 'admin']:
                 client.chat_postEphemeral(
                     channel=command['channel_id'],
                     user=command['user_id'],

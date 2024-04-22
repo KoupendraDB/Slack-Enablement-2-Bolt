@@ -7,10 +7,11 @@ with open('./config.json') as config_file:
 
 server = config['backend_server_uri']
 
-def make_request(name, request_type, data = {}, headers = {}, url_param = {}, params={}):
+def make_request(name, data = {}, headers = {}, url_param = {}, params={}):
     headers['Accept'] = '*/*';
     headers['Content-Type'] = 'application/json'
-    endpoint = endpointNames[name]
+    endpoint = endpointNames[name]['ENDPOINT']
+    request_type = endpointNames[name]['METHOD']
     if len(url_param):
         endpoint = endpoint.format(**url_param)
     uri = server + endpoint

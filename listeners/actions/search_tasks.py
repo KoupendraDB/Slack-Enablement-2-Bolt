@@ -1,5 +1,5 @@
 from ..events.helpers import get_task_status_options
-from services.backend.projects import get_project
+from services.backend.external import get_project
 from .task_modal import get_assignee_selector_options
 
 def search_tasks_modal(project_id, project):
