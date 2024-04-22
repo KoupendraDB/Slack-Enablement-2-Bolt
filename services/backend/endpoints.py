@@ -65,7 +65,7 @@ names = {
     },
     'ROLL_OFF_MEMBERS': {
         'METHOD': 'POST',
-        'ENDPOINT': "/project/{project_id}/roll-of-members"
+        'ENDPOINT': "/project/{project_id}/roll-off-members"
     },
     'SEARCH_TASKS': {
         'METHOD': 'GET',

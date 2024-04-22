@@ -19,4 +19,4 @@ def register(app):
     app.view(re.compile("update_task-(.+)"))(submit_update_task)
     app.view(re.compile("submit_invite_members-(.+)"))(submit_invite_members)
     app.view(re.compile("submit_join_project"))(submit_join_project)
-    app.view(re.compile("submit_roll_off"))(submit_roll_off)
+    app.view(re.compile("submit_roll_off-(.+)"))(submit_roll_off)

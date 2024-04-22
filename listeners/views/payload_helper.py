@@ -74,3 +74,9 @@ def invite_members_from_payload(payload):
     if payload.get('qas'):
         members.extend([option['value'] for option in payload['qas']['qas']['selected_options']])
     return members
+
+def roll_off_members_from_payload(payload):
+    members = []
+    if payload.get('members'):
+        members.extend([option['value'] for option in payload['members']['members']['selected_options']])
+    return members
