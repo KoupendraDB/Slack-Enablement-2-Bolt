@@ -33,30 +33,38 @@ def register_form_from_payload(payload, user):
 def search_form_from_payload(payload):
     form = {}
     if payload['title']['title']['value']:
-        form['title_$regex'] = payload['title']['title']['value']
+        form['title'] = {'$regex': payload['title']['title']['value']}
     if len(payload['assignees']['assignees']['selected_options']):
-        form['assignee_$in'] = ','.join([option['value'] for option in payload['assignees']['assignees']['selected_options']])
+        form['assignee'] = {'$in': [option['value'] for option in payload['assignees']['assignees']['selected_options']]}
     if len(payload['statuses']['statuses']['selected_options']):
-        form['status_$in'] = ','.join(list(map(lambda x: x['value'], payload['statuses']['statuses']['selected_options'])))
+        form['status'] = {'$in': list(map(lambda x: x['value'], payload['statuses']['statuses']['selected_options']))}
     if payload['due_date']['min_due_date']['selected_date']:
-        form['eta_done_$gte'] = payload['due_date']['min_due_date']['selected_date']
+        form['eta_done'] = {'$gte': payload['due_date']['min_due_date']['selected_date']}
     if payload['due_date']['max_due_date']['selected_date']:
-        form['eta_done_$lte'] = payload['due_date']['max_due_date']['selected_date']
+        form['eta_done'] = {'$lte': payload['due_date']['max_due_date']['selected_date']}
     if len(payload['creators']['creators']['selected_options']):
-        form['created_by_$in'] = ','.join([option['value'] for option in payload['creators']['creators']['selected_options']])
+        form['created_by'] = {'$in': [option['value'] for option in payload['creators']['creators']['selected_options']]}
     if payload['created_date']['min_created_date']['selected_date']:
-        form['created_at_$gte'] = payload['created_date']['min_created_date']['selected_date']
+        form['created_at'] = {'$gte': payload['created_date']['min_created_date']['selected_date']}
     if payload['created_date']['max_created_date']['selected_date']:
-        form['created_at_$lte'] = payload['created_date']['max_created_date']['selected_date']
+        form['created_at'] = {'$lte': payload['created_date']['max_created_date']['selected_date']}
     return form
 
 def project_form_from_payload(payload):
     return {
-        'name': payload['project_name']['project_name']['value'],
-        'channel': payload['channel_name']['channel_name']['value'],
-        'project_manager': payload['project_manager']['project_manager']['selected_option']['value'],
-        'developers': [option['value'] for option in payload['developers']['developers']['selected_options']],
-        'qas': [option['value'] for option in payload['qas']['qas']['selected_options']],
+        'details': {
+            'name': payload['project_name']['project_name']['value'],
+            'channel': payload['channel_name']['channel_name']['value']
+        },
+        'members': 
+            [payload['project_manager']['project_manager']['selected_option']['value']] +
+            [option['value'] for option in payload['developers']['developers']['selected_options']] + 
+            [option['value'] for option in payload['qas']['qas']['selected_options']],
+        'user_by_role': {
+            'developers': [option['value'] for option in payload['developers']['developers']['selected_options']],
+            'qas': [option['value'] for option in payload['qas']['qas']['selected_options']],
+            'project_manager': payload['project_manager']['project_manager']['selected_option']['value']
+        }
     }
 
 def invite_members_from_payload(payload):

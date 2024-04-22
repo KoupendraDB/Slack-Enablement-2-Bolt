@@ -24,15 +24,15 @@ def get_option_groups(project_id):
             "value": user['username']
         }
         if user['role'] == 'developer':
-            option_groups[0].append(option)
+            option_groups[0]['options'].append(option)
         elif user['role'] == 'qa':
-            option_groups[1].append(option)
+            option_groups[1]['options'].append(option)
 
-    filtered_groups = list(filter(lambda x: len(x['options'] > 0), option_groups))
+    filtered_groups = list(filter(lambda x: len(x['options']) > 0, option_groups))
     return filtered_groups
 
-def get_roll_off_modal(project):
-    option_groups = get_option_groups(project)
+def get_roll_off_modal(project_id):
+    option_groups = get_option_groups(project_id)
     if len(option_groups) == 0:
         return None
 
@@ -45,7 +45,7 @@ def get_roll_off_modal(project):
             "type": "plain_text",
             "text": "Roll Off",
         },
-        "callback_id": f"submit_roll_off-{project['_id']}",
+        "callback_id": f"submit_roll_off-{project_id}",
         "blocks": [
             {
                 "type": "section",
@@ -73,6 +73,7 @@ def command_roll_off(ack, logger, command, client, body):
     try:
         result = get_project_by_channel(command['channel_id'])
         project = result.get('project')
+        ack()
         if project:
             role = fetch_user_role(command['team_id'], command['user_id'])
             if role not in ['project_manager', 'admin']:
@@ -81,9 +82,8 @@ def command_roll_off(ack, logger, command, client, body):
                     user=command['user_id'],
                     text = "You don't have permission to invite!"
                 )
-                ack()
                 return
-            modal = get_roll_off_modal(project)
+            modal = get_roll_off_modal(project['_id'])
             
             if modal:
                 client.views_open(

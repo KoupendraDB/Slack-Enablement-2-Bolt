@@ -3,7 +3,7 @@ from services.backend.external import get_project
 from .task_modal import get_assignee_selector_options
 
 def search_tasks_modal(project_id, project):
-    option_groups, users = get_assignee_selector_options(project)
+    option_groups, _ = get_assignee_selector_options(project_id)
     modal = {
         "type": "modal",
         "title": {

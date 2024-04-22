@@ -136,12 +136,13 @@ def accept_project_invite(workspace, user, invitation_code):
     )
     return result
 
-def create_project_invite(workspace, user, project_id, invitee):
+def create_project_invite(workspace, user, project_id, invitees):
     jwt = fetch_user_jwt(workspace, user)
     result = make_request(
         name='CREATE_PROJECT_INVITE',
         headers={'bearer-token': jwt},
-        url_param={'project_id': project_id, 'invitee': invitee}
+        url_param={'project_id': project_id},
+        data={'invitees': invitees}
     )
     return result
 

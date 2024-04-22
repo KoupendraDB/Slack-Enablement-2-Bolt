@@ -28,15 +28,15 @@ def get_assignee_selector_options(project_id, initial_user = None):
             "value": user['username']
         }
         if user['role'] == 'project_manager':
-            option_groups[0].append(option)
+            option_groups[0]['options'].append(option)
         elif user['role'] == 'developer':
-            option_groups[1].append(option)
+            option_groups[1]['options'].append(option)
         elif user['role'] == 'qa':
-            option_groups[2].append(option)
+            option_groups[2]['options'].append(option)
         elif user['role'] == 'admin':
-            option_groups[3].append(option)
+            option_groups[3]['options'].append(option)
 
-    filtered_groups = list(filter(lambda x: len(x['options'] > 0), option_groups))
+    filtered_groups = list(filter(lambda x: len(x['options']) > 0, option_groups))
     
     if initial_user:
         return filtered_groups, {

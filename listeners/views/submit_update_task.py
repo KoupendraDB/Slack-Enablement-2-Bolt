@@ -6,7 +6,7 @@ def submit_update_task(ack, logger, body, context, client, payload, say):
     try:
         form = task_form_from_payload(body['view']['state']['values'], context['user_id'])
         task_id = payload['callback_id'].replace('update_task-', '')
-        result = update_task(task_id, context['team_id'], context['user_id'], form)
+        result = update_task(context['team_id'], context['user_id'], task_id, form)
         if result.get('success', False):
             ack()
             project_id = result.get('task', {}).get('project', None)

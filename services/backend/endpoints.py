@@ -17,7 +17,7 @@ names = {
     },
     'GET_USER_PROJECT_TASKS': {
         'METHOD': 'GET',
-        'ENDPOINT': "/user/projects/{project_id}/tasks"
+        'ENDPOINT': "/user/project/{project_id}/tasks"
     },
     'GET_USER_PERSONAL_TASKS': {
         'METHOD': 'GET',

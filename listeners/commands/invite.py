@@ -1,4 +1,5 @@
 from services.backend.external import get_project_by_channel
+from services.backend.roles import fetch_user_role
 
 def get_invite_member_modal(project_id):
     return {
@@ -55,7 +56,8 @@ def command_invite_member(ack, body, logger, client, command):
         result = get_project_by_channel(command['channel_id'])
         project = result.get('project')
         if project:
-            if command['user_id'] not in [project['project_manager'], project['admin']]:
+            role = fetch_user_role(command['team_id'], command['user_id'])
+            if role not in ['project_manager', 'admin']:
                 client.chat_postEphemeral(
                     channel=command['channel_id'],
                     user=command['user_id'],

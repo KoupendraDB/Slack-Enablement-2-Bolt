@@ -4,39 +4,37 @@ from services.backend.external import create_project
 
 def get_welcome_message(form):
     new_line = '\n'
-    return f'''Welcome to *{form['name']}*!{new_line*2}\
+    return f'''Welcome to *{form['details']['name']}*!{new_line*2}\
 *Project Manager:*{new_line}\
-<@{form['project_manager']}>{new_line*2}\
+<@{form['user_by_role']['project_manager']}>{new_line*2}\
 *Developers:*{new_line}\
-{new_line.join(map(lambda x: f'<@{x}>', form['developers']))}{new_line*2}\
+{new_line.join(map(lambda x: f'<@{x}>', form['user_by_role']['developers']))}{new_line*2}\
 *QAs:*{new_line}\
-{new_line.join(map(lambda x: f'<@{x}>', form['qas']))}{new_line}'''
+{new_line.join(map(lambda x: f'<@{x}>', form['user_by_role']['qas']))}{new_line}'''
 
 def submit_create_project(ack, payload, client, context, logger):
     try:
         form = project_form_from_payload(payload['state']['values'])
-        form['admin'] = context['user_id']
+        form['members'].append(context['user_id'])
         create_channel_response = client.conversations_create(
-            name = form['channel'],
+            name = form['details']['channel'],
             team_id = context['team_id'],
             is_private = True
         )
         channel_id = create_channel_response['channel']['id']
-        form['channel_id'] = channel_id
+        form['details']['channel_id'] = channel_id
+        ack()
         result = create_project(context['team_id'], context['user_id'], form)
         if not result.get('success', False):
-            ack(
-                response_action = 'errors',
-                errors = {
-                    'name': 'Session expired! Please log in'
-                }
+            client.chat_postMessage(
+                channel = context['user_id'],
+                text = 'Session expired! Please log in to create a project'
             )
-        ack()
         
-        users = form['developers'] + form['qas'] + [form['project_manager'], form['admin']]
+        users = form['members']
         client.conversations_setTopic(
             channel = channel_id,
-            topic = form['name']
+            topic = form['details']['name']
         )
         client.conversations_invite(
             channel = channel_id,
@@ -44,7 +42,7 @@ def submit_create_project(ack, payload, client, context, logger):
         )
         client.chat_postMessage(
             channel=channel_id, 
-            text = f"Welcome to {form['name']}",
+            text = f"Welcome to {form['details']['name']}",
             blocks = [{
                     "type": "section",
                     "text": {
