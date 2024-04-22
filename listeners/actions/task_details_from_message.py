@@ -9,9 +9,11 @@ def task_details_from_message(ack, action, context, client, body):
     result = get_task(workspace, user, task_id)
     ack()
     if result.get('success', False):
+        task = result['task']
+        task['_id'] = task_id
         client.views_open(
             trigger_id = body['trigger_id'],
-            view = create_task_detail_modal(result['task'])
+            view = create_task_detail_modal(task)
         )
     else:
         client.chat_postEphemeral(

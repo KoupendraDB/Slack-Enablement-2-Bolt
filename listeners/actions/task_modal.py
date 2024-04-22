@@ -142,7 +142,7 @@ def get_update_task_modal(context, user_task, task_id):
     }
     project_id = user_task.get('project', None)
     if project_id:
-        option_groups, initial_option = get_assignee_selector_options(project_id, user)
+        option_groups, initial_option = get_assignee_selector_options(project_id, user_task['assignee'])
         action_elements['elements'].insert(0, {
             "type": "static_select",
             "action_id": f"task_modal_assignee_selector",
@@ -261,12 +261,20 @@ def update_task_modal(ack, context, action, client, body):
     user = context['user_id']
     task_id = action['value']
     result = get_task(team, user, task_id)
+    new_modal = action['action_id'].replace('update_task_modal-', '') == 'open'
     if result.get('success', False):
         modal = get_update_task_modal(context, result['task'], task_id)
-        client.views_open(
-            trigger_id = body["trigger_id"],
-            view = modal
-        )
+        if new_modal:
+            client.views_open(
+                trigger_id = body["trigger_id"],
+                view = modal
+            )
+        else:
+            client.views_push(
+                trigger_id = body["trigger_id"],
+                view = modal
+            )
+            
 
 
 def create_task_modal(ack, body, client, logger, context, action):

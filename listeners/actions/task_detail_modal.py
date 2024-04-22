@@ -1,5 +1,6 @@
 from datetime import date, datetime
 from services.backend.external import get_task
+from services.backend.roles import fetch_user_role
 from json import loads
 
 def get_task_details(user_task):
@@ -52,7 +53,7 @@ def get_task_details(user_task):
     task_details = [description] + details
     return task_details
 
-def create_task_detail_modal(task):
+def create_task_detail_modal(task, role = None):
     blocks = [
         {
             "type": "divider"
@@ -90,6 +91,24 @@ def create_task_detail_modal(task):
         }
     ]
     blocks.extend(get_task_details(task))
+    
+    if role in ['project_manager', 'admin']:
+        blocks.append({
+            "type": "actions",
+            "elements": [
+                {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Update :pencil2:",
+                        "emoji": True
+                    },
+                    "value": task['_id'],
+                    "action_id": f"update_task_modal-push"
+                }
+            ]
+        })
+
     view = {
         "type": "modal",
         "title": {
@@ -112,8 +131,10 @@ def task_detail_modal(ack, body, client, context, action):
     result = get_task(team, user, task_id)
     if result.get('success', False):
         ack()
+        task = result['task']
+        task['_id'] = task_id
         client.views_push(
             trigger_id = trigger_id,
-            view = create_task_detail_modal(result['task'])
+            view = create_task_detail_modal(task, fetch_user_role(team, user))
         )
     

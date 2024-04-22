@@ -26,7 +26,7 @@ def get_action_elements(user, user_task):
             "emoji": True
         },
         "value": user_task['_id'],
-        "action_id": f"update_task_modal-{user_task['_id']}"
+        "action_id": f"update_task_modal-open"
     }]
     if user == user_task['created_by']:
         elements.append({

@@ -7,6 +7,7 @@ from .login import login
 from .search_tasks import search_tasks
 from .submit_invite_members import submit_invite_members
 from .submit_join_project import submit_join_project
+from .submit_roll_off import submit_roll_off
 
 def register(app):
     app.view("submit_new_task")(submit_new_task)
@@ -18,3 +19,4 @@ def register(app):
     app.view(re.compile("update_task-(.+)"))(submit_update_task)
     app.view(re.compile("submit_invite_members-(.+)"))(submit_invite_members)
     app.view(re.compile("submit_join_project"))(submit_join_project)
+    app.view(re.compile("submit_roll_off"))(submit_roll_off)
