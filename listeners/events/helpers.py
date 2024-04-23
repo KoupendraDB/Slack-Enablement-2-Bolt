@@ -284,15 +284,39 @@ def handle_home_view(client, team, user, selected_project = None, selected_statu
         
         if (user_role in ['admin', 'project_manager']) and selected_project:
             project_specific_buttons.append({
-            "type": "button",
-            "text": {
-                "type": "plain_text",
-                "text": "Search tasks :mag:",
-                "emoji": True
-            },
-            "value": selected_project,
-            "action_id": "search_tasks",
-        })
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Search tasks :mag:",
+                    "emoji": True
+                },
+                "value": selected_project,
+                "action_id": "search_tasks",
+            })
+
+            project_specific_buttons.append({
+                "type": "button",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Invite members :door:",
+                    "emoji": True
+                },
+                "value": selected_project,
+                "action_id": "invite_members",
+            })
+
+            project_specific_buttons.append({
+                "type": "button",
+                "style": "danger",
+                "text": {
+                    "type": "plain_text",
+                    "text": "Roll off members :wave:",
+                    "emoji": True
+                },
+                "value": selected_project,
+                "action_id": "roll_off_members",
+            })
+
 
         blocks = [
             {

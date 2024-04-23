@@ -10,6 +10,8 @@ from .home_project_filter import home_project, home_personal_project
 from .task_modal import update_task_modal, create_task_modal, task_modal_due_date_selector, task_modal_assignee_selector, task_modal_status_selector
 from .create_project import create_project
 from .join_project import join_project
+from .invite_members import invite_members
+from .roll_off_members import roll_off_members
 
 def register(app):
     # Login
@@ -27,6 +29,8 @@ def register(app):
     # Project specific buttons
     app.action("create_task")(create_task_modal)
     app.action("search_tasks")(search_tasks)
+    app.action("invite_members")(invite_members)
+    app.action("roll_off_members")(roll_off_members)
 
     # Task Status filter buttons
     app.action(re.compile("home_task_status-(.+)"))(home_task_status)
