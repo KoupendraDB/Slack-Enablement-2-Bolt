@@ -55,6 +55,10 @@ names = {
         'METHOD': 'GET',
         'ENDPOINT': "/project/{project_id}/members"
     },
+    'ARCHIVE_PROJECT': {
+        'METHOD': 'POST',
+        'ENDPOINT': "/project/{project_id}/archive"
+    },
     'ACCEPT_PROJECT_INVITE': {
         'METHOD': 'POST',
         'ENDPOINT': "/project/accept-invite/{invitation_code}"

@@ -3,7 +3,7 @@ from services.backend.external import get_project_by_channel, get_project_member
 def member_joined_channel(event, client, logger):
     from app import bot_info
     try:
-        if event['inviter'] != bot_info['user_id']:
+        if event.get('inviter', '') != bot_info['user_id']:
             result = get_project_by_channel(event['channel'])
             project = result.get('project')
             if project:

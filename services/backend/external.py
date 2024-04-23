@@ -127,6 +127,15 @@ def get_project_members(project_id):
     )
     return result
 
+def archive_project(workspace, user, project_id):
+    jwt = fetch_user_jwt(workspace, user)
+    result = make_request(
+        name='ARCHIVE_PROJECT',
+        headers={'bearer-token': jwt},
+        url_param={'project_id': project_id}
+    )
+    return result
+
 def accept_project_invite(workspace, user, invitation_code):
     jwt = fetch_user_jwt(workspace, user)
     result = make_request(

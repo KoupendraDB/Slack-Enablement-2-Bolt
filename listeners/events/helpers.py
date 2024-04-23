@@ -307,7 +307,6 @@ def handle_home_view(client, team, user, selected_project = None, selected_statu
 
             project_specific_buttons.append({
                 "type": "button",
-                "style": "danger",
                 "text": {
                     "type": "plain_text",
                     "text": "Roll off members :wave:",
@@ -316,6 +315,19 @@ def handle_home_view(client, team, user, selected_project = None, selected_statu
                 "value": selected_project,
                 "action_id": "roll_off_members",
             })
+
+            if user_role == 'admin':
+                project_specific_buttons.append({
+                    "type": "button",
+                    "style": "danger",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Archive Project :put_litter_in_its_place:",
+                        "emoji": True
+                    },
+                    "value": selected_project,
+                    "action_id": "archive_project",
+                })
 
 
         blocks = [

@@ -12,6 +12,7 @@ from .create_project import create_project
 from .join_project import join_project
 from .invite_members import invite_members
 from .roll_off_members import roll_off_members
+from .archive_project import archive_project
 
 def register(app):
     # Login
@@ -31,6 +32,7 @@ def register(app):
     app.action("search_tasks")(search_tasks)
     app.action("invite_members")(invite_members)
     app.action("roll_off_members")(roll_off_members)
+    app.action("archive_project")(archive_project)
 
     # Task Status filter buttons
     app.action(re.compile("home_task_status-(.+)"))(home_task_status)

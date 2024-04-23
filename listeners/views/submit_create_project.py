@@ -36,6 +36,10 @@ def submit_create_project(ack, payload, client, context, logger):
             channel = channel_id,
             topic = form['details']['name']
         )
+        client.conversations_setPurpose(
+            channel = channel_id,
+            purpose = f"Collorative space for members of {form['details']['name']} project"
+        )
         client.conversations_invite(
             channel = channel_id,
             users = users
