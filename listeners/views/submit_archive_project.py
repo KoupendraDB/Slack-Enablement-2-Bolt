@@ -12,7 +12,7 @@ def submit_archive_project(ack, payload, context, client):
             client.conversations_archive(channel = channel_id)
             client.chat_postMessage(
                 channel = context['user_id'],
-                text = f"{project['name']} has been archived successfully!"
+                text = f"Project *{project['name']}* has been archived successfully!"
             )
     else:
         client.chat_postMessage(
