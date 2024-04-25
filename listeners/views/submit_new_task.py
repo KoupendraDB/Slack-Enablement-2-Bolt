@@ -7,7 +7,6 @@ def get_file_urls_from_payload(payload, task_id):
     result = {}
     for i in range(len(files)):
         result[f"{task_id}-{i + 1}"] = files[i]['url_private']
-    print(result)
     return result
 
 
