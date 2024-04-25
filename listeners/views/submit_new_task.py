@@ -1,10 +1,21 @@
 from .payload_helper import task_form_from_payload
 from services.backend.external import create_task, get_project
+from services.backend.aws_s3 import store_files
+
+def get_file_urls_from_payload(payload, task_id):
+    files = payload['file_input']['file_input']['files']
+    result = {}
+    for i in range(len(files)):
+        result[f"{task_id}-{i + 1}"] = files[i]['url_private']
+    print(result)
+    return result
+
 
 def submit_new_task(ack, logger, body, context, client, payload):
     try:
         project_id = payload['callback_id'].replace('submit_new_task', '').replace('-', '')
-        form = task_form_from_payload(body['view']['state']['values'], context['user_id'], project_id)
+        payload = body['view']['state']['values']
+        form = task_form_from_payload(payload, context['user_id'], project_id)
         ack()
         channel_id = form['assignee']
         if project_id:
@@ -13,6 +24,8 @@ def submit_new_task(ack, logger, body, context, client, payload):
             channel_id = project['channel_id']
         result = create_task(context['team_id'], context['user_id'], form)
         if result.get('success', False):
+            files = get_file_urls_from_payload(payload, result['task_id'])
+            store_files(files)
             client.chat_postMessage(
                 channel = channel_id,
                 text=f"<@{context['user_id']}> has created and assigned `{form['title']}` to <@{form['assignee']}>!",

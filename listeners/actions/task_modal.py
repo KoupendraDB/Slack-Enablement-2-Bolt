@@ -253,6 +253,19 @@ def get_create_task_modal(context, project_id = None, description = {'type': 'ri
         })
         modal['callback_id'] += f'-{project_id}'
     modal['blocks'].append(action_elements)
+    modal['blocks'].append({
+        "type": "input",
+        "block_id": "file_input",
+        "label": {
+            "type": "plain_text",
+            "text": "Upload Files"
+        },
+        "element": {
+            "type": "file_input",
+            "action_id": "file_input",
+            "max_files": 5,
+        }
+    })
     return modal
 
 def update_task_modal(ack, context, action, client, body):
