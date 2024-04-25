@@ -5,8 +5,8 @@ from services.backend.aws_s3 import store_files
 def get_file_urls_from_payload(payload, task_id):
     files = payload['file_input']['file_input']['files']
     result = {}
-    for i in range(len(files)):
-        result[f"{task_id}-{i + 1}"] = files[i]['url_private']
+    for file in files:
+        result[f"{task_id}/{file['name']}"] = file['url_private']
     return result
 
 
